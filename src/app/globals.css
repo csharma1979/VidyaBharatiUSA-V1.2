@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a; /* Custom dark slate for text */
+  
+  /* Brand Colors */
+  --saffron: #F4911F;
+  --deep-blue: #003366;
+  
+  /* Layout */
+  --header-height: 4rem;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Brand colors */
+  --color-saffron: var(--saffron);
+  --color-deep-blue: var(--deep-blue);
+  
+  /* Typography mappings */
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  
+  /* Extended spacing */
+  --spacing-section: 6rem;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  max-width: 1280px;
+  padding-inline: 1.5rem;
+}
+
+@utility container-tight {
+  margin-inline: auto;
+  max-width: 1024px;
+  padding-inline: 1.5rem;
+}
+
+/* Custom transitions */
+.transition-glass {
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+}
+
+/* Performance: Optimise animated elements */
+.hero-slider-image {
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+/* Prevent layout shift for images */
+img {
+  height: auto;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
