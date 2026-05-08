@@ -52,7 +52,7 @@ export default function Home() {
                 we are building the future leaders of tomorrow.
               </p>
               
-              <Button variant="link" size="md" className="group">
+              <Button variant="link" size="md" className="group" href="/programs/shiksha-daan" as="span">
                 Learn more about our mission 
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>

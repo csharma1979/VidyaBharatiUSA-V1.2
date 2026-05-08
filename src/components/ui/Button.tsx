@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -8,10 +9,12 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "link";
   size?: "sm" | "md" | "lg" | "icon";
   children?: React.ReactNode;
+  as?: any;
+  href?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", children, ...props }, ref) => {
+  ({ className, variant = "primary", size = "md", children, as: Component = "button", href, ...props }, ref) => {
     const variants = {
       primary: "bg-saffron text-white hover:bg-orange-600 shadow-md",
       secondary: "bg-deep-blue text-white hover:bg-slate-800 shadow-md",
@@ -27,8 +30,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon: "p-2",
     };
 
-    return (
-      <motion.button
+    const MotionComponent = motion(Component);
+
+    const content = (
+      <MotionComponent
         ref={ref}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -41,8 +46,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {children}
-      </motion.button>
+      </MotionComponent>
     );
+
+    if (href) {
+      return (
+        <Link href={href} className="contents">
+          {content}
+        </Link>
+      );
+    }
+
+    return content;
   }
 );
 

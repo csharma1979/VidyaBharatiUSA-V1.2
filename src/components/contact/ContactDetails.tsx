@@ -8,8 +8,8 @@ const contactOptions = [
   {
     icon: Phone,
     label: "Call Us",
-    value: "+1 (281) 845-1752",
-    href: "tel:+12818451752",
+    value: "+1 (516) 840-9810",
+    href: "tel:+15168409810",
     color: "bg-blue-50 text-blue-600",
   },
   {

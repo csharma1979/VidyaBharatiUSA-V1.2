@@ -8,6 +8,7 @@ import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import eventsHero from "@/assets/empowering generation through education.png";
 
 const sampleEvents = [
@@ -18,22 +19,60 @@ const sampleEvents = [
     time: "2 Nov 2024 - 27 Dec 2025",
     location: "India",
     type: "Workshop",
-    description: "To develop a National System of Education that fosters a younger generation committed to Hindutva and infused with patriotic fervor—one that is physically, mentally, spiritually, and emotionally well-rounded; capable of successfully facing life's challenges; and dedicated to serving our brothers and sisters who dwell in villages,",
+    description: "To develop a National System of Education that fosters a younger generation committed to Hindutva and infused with patriotic fervor—one that is physically, mentally, spiritually, and emotionally well-rounded.",
     image: "/images/events/workshop.webp" 
   },
   {
     id: 2,
-    title: "Webinar: Unlocking Creativity and Innovation",
+    title: "Webinar: Unlocking Creativity",
     date: "OCT 21",
     time: "21 Oct 2024, 07:00 PM",
     location: "Virtual Event",
     type: "Webinar",
-    description: "Join the PAN VBFA Alumni Forum for an Insightful Webinar on Creativity and Innovation! Are you curious about the difference between creativity and innovation? Do you want to discover the key ingredients for fostering creativity and the framework for effective innovation? Featured Speaker: Mr. Bharat Iyer Art of Living Corporate Faculty",
+    description: "Join the PAN VBFA Alumni Forum for an Insightful Webinar on Creativity and Innovation! Featured Speaker: Mr. Bharat Iyer Art of Living Corporate Faculty.",
     image: "/images/events/webinar.webp"
+  },
+  {
+    id: 3,
+    title: "LA Charity Gala 2024",
+    date: "DEC 15",
+    time: "15 Dec 2024, 06:00 PM",
+    location: "Los Angeles",
+    type: "Gala",
+    description: "An evening of inspiration and fundraising in the heart of Los Angeles. Join us for a special night dedicated to rural education.",
+    image: "/images/events/gala.webp"
+  },
+  {
+    id: 4,
+    title: "Boston Education Summit",
+    date: "JAN 10",
+    time: "10 Jan 2025, 09:00 AM",
+    location: "Boston",
+    type: "Summit",
+    description: "A gathering of educators, donors, and visionaries in Boston to discuss sustainable development in rural Indian schools.",
+    image: "/images/events/summit.webp"
+  },
+  {
+    id: 5,
+    title: "Houston Community Meetup",
+    date: "FEB 05",
+    time: "05 Feb 2025, 05:00 PM",
+    location: "Houston",
+    type: "Meetup",
+    description: "Connecting our Houston community with impact stories from the ground. A chance to network and share our collective vision.",
+    image: "/images/events/meetup.webp"
   }
 ];
 
 export default function EventsPage() {
+  const [activeFilter, setActiveFilter] = React.useState("All");
+  
+  const filters = ["All", "Los Angeles", "Boston", "Houston"];
+  
+  const filteredEvents = activeFilter === "All" 
+    ? sampleEvents 
+    : sampleEvents.filter(event => event.location === activeFilter);
+
   return (
     <main className="min-h-screen bg-slate-50">
       <Navbar />
@@ -56,8 +95,26 @@ export default function EventsPage() {
 
       <section className="py-24">
         <div className="container px-6 mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {sampleEvents.map((event) => (
+          {/* Filter Bar */}
+          <div className="flex flex-wrap justify-center gap-4 mb-20">
+            {filters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={cn(
+                  "px-8 py-3 rounded-full font-black uppercase tracking-widest text-[10px] transition-all duration-300",
+                  activeFilter === filter 
+                    ? "bg-saffron text-white shadow-xl shadow-saffron/20 scale-105" 
+                    : "bg-white text-slate-400 hover:text-deep-blue border border-slate-100 hover:border-slate-200"
+                )}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {filteredEvents.map((event) => (
               <div key={event.id} className="bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-all duration-300 group flex flex-col">
                 <div className="relative h-64 w-full overflow-hidden bg-slate-200">
                   <Image 
@@ -91,7 +148,7 @@ export default function EventsPage() {
                     </div>
                   </div>
                   
-                  <p className="text-slate-600 leading-relaxed mb-8 flex-1">
+                  <p className="text-slate-600 leading-relaxed mb-8 line-clamp-3">
                     {event.description}
                   </p>
                   
@@ -107,6 +164,12 @@ export default function EventsPage() {
               </div>
             ))}
           </div>
+
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-slate-400 text-lg">No events found in this location yet. Check back soon!</p>
+            </div>
+          )}
         </div>
       </section>
 
