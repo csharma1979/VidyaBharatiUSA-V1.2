@@ -12,6 +12,7 @@ const footerLinks = [
       { name: "Global Impact", href: "/#impact" },
       { name: "Gallery", href: "/gallery" },
       { name: "Events", href: "/events" },
+      { name: "Alumni", href: "/alumni" },
       { name: "Contact Us", href: "/contact" },
     ],
   },
@@ -40,11 +41,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-6">
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3" aria-label="VidyaBharati USA Home">
               <div className="relative w-12 h-12">
                 <Image
                   src="/Vidya-Bharati-logo.webp"
-                  alt="VidyaBharati Logo"
+                  alt="VidyaBharati USA - Quality Education Nonprofit Logo"
                   fill
                   className="object-contain"
                 />
@@ -55,17 +56,21 @@ export function Footer() {
               Empowering underprivileged children in India through quality education, 
               holistic development, and sustainable community growth.
             </p>
+            <div className="space-y-2 text-sm text-slate-400">
+              <p>Email: <Link href="mailto:info@vidyabharatiusa.org" className="hover:text-white transition-colors">info@vidyabharatiusa.org</Link></p>
+              <p>Status: Registered 501(c)(3) Nonprofit Organization</p>
+            </div>
             <div className="flex space-x-4">
-              <Link href="#" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors">
+              <Link href="https://facebook.com/vidyabharatiusa" target="_blank" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors" aria-label="Visit our Facebook page">
                 <Facebook className="w-5 h-5" />
               </Link>
-              <Link href="#" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors">
+              <Link href="https://twitter.com/vidyabharatiusa" target="_blank" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors" aria-label="Visit our Twitter page">
                 <Twitter className="w-5 h-5" />
               </Link>
-              <Link href="#" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors">
+              <Link href="https://instagram.com/vidyabharatiusa" target="_blank" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors" aria-label="Visit our Instagram page">
                 <Instagram className="w-5 h-5" />
               </Link>
-              <Link href="#" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors">
+              <Link href="https://youtube.com/vidyabharatiusa" target="_blank" className="p-2 bg-slate-800 rounded-full hover:bg-saffron transition-colors" aria-label="Visit our Youtube channel">
                 <Youtube className="w-5 h-5" />
               </Link>
             </div>

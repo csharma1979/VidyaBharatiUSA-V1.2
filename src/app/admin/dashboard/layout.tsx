@@ -81,6 +81,7 @@ export default function DashboardLayout({
       items: [
         { name: "Blog management", href: "/admin/dashboard/blog", icon: PenTool },
         { name: "Home page", href: "/admin/dashboard/homepage", icon: Globe },
+        { name: "Enquiries", href: "/admin/dashboard/enquiry", icon: FileText },
       ]
     },
     {

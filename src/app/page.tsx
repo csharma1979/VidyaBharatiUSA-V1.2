@@ -61,7 +61,7 @@ export default function Home() {
             <div className="relative aspect-square md:aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl">
               <Image
                 src={whoWeAreImage}
-                alt="Who We Are"
+                alt="Vidya Bharati USA students in a classroom - Empowering through quality education"
                 fill
                 className="object-cover object-center"
                 loading="lazy"
@@ -86,7 +86,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {programs.map((program) => (
-              <div key={program.title} className="group cursor-pointer bg-white border border-slate-100 p-10 rounded-[2rem] hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+              <Link href="/impact" key={program.title} className="group cursor-pointer bg-white border border-slate-100 p-10 rounded-[2rem] hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                 <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-slate-50 group-hover:bg-saffron group-hover:text-white transition-colors", program.color)}>
                   <program.icon className="w-8 h-8" />
                 </div>
@@ -97,7 +97,7 @@ export default function Home() {
                 <div className="flex items-center text-sm font-bold text-saffron group-hover:underline">
                   EXPLORE PROGRAM <ArrowRight className="w-4 h-4 ml-2" />
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

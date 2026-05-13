@@ -1,5 +1,12 @@
 import { SponsorshipLayout } from "@/components/ui/SponsorshipLayout";
 import classroomConstruct from "@/assets/classroom construct.png";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sponsor a Classroom | Build School Infrastructure | VidyaBharati USA",
+  description: "Help VidyaBharati USA build modern classrooms in rural India. Your sponsorship provides a safe and inspiring environment for thousands of children to learn.",
+  keywords: ["sponsor classroom", "school construction donation", "build schools India", "educational infrastructure NGO"],
+};
 
 export default function ClassroomConstructionPage() {
   return (

@@ -27,3 +27,11 @@ export async function verifyToken(token: string) {
     return null;
   }
 }
+import { cookies } from "next/headers";
+
+export async function getAdminSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_auth_token")?.value;
+  if (!token) return null;
+  return await verifyToken(token);
+}

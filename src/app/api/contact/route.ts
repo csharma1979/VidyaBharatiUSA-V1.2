@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { connectToDB } from "@/lib/db";
+import Enquiry from "@/models/Enquiry";
 
 export async function POST(req: Request) {
   try {
+    await connectToDB();
     const body = await req.json();
-    const { name, email, subject, message } = body;
+    const { name, email, phone, subject, message } = body;
 
     // Basic validation
     if (!name || !email || !subject || !message) {
@@ -13,21 +16,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // In a real application, you would send an email here using a service like Resend, Nodemailer, or SendGrid.
-    // For now, we'll log the submission and return success.
-    console.log("Contact Form Submission:", body);
+    // Save to database
+    const enquiry = await Enquiry.create({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone?.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+    });
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Contact Form Saved:", enquiry._id);
 
     return NextResponse.json(
-      { message: "Enquiry sent successfully!" },
-      { status: 200 }
+      { message: "Enquiry sent successfully!", id: enquiry._id },
+      { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Contact Form Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }

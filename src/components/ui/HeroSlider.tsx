@@ -14,8 +14,8 @@ const slides = [
   {
     id: 1,
     image: empoweringImage,
-    title: "Empowering Generations Through Education",
-    subtitle: "Fostering holistic growth and enduring values for underprivileged children across India.",
+    title: "VidyaBharati USA: Empowering Generations Through Education",
+    subtitle: "Fostering holistic growth and enduring values for underprivileged children across India through quality education.",
     ctaText: "Donate to Educate",
     ctaIcon: Heart,
   },
@@ -158,14 +158,24 @@ export function HeroSlider() {
                 transition={{ delay: 0.6, duration: 0.8 }}
                 className="pt-6"
               >
-                <Link href="/donate">
-                  <Button variant="primary" size="lg" className="group/btn text-lg border border-saffron/50">
-                    {React.createElement(slides[current].ctaIcon, {
-                      className: "w-5 h-5 mr-3 group-hover/btn:fill-current transition-colors"
-                    })}
-                    {slides[current].ctaText}
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <Link href="/donate">
+                    <Button variant="primary" size="lg" className="group/btn text-lg border border-saffron/50 w-full sm:w-auto">
+                      {React.createElement(slides[current].ctaIcon, {
+                        className: "w-5 h-5 mr-3 group-hover/btn:fill-current transition-colors"
+                      })}
+                      {slides[current].ctaText}
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="text-white border-white/30 hover:bg-white/10 text-lg w-full sm:w-auto"
+                    onClick={() => window.dispatchEvent(new CustomEvent("showUSAProgramDetails"))}
+                  >
+                    View USA Tour Schedule
                   </Button>
-                </Link>
+                </div>
               </motion.div>
             </motion.div>
           </div>

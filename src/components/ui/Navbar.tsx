@@ -32,6 +32,7 @@ const navLinks = [
     ]
   },
   { name: "Impact", href: "/impact" },
+  { name: "Events", href: "/events" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -195,9 +196,27 @@ export function Navbar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
 
+  const [isBannerActive, setIsBannerActive] = React.useState(false);
+
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 20); // Lower threshold for mobile
+    setIsScrolled(latest > 20);
+    // Sync banner state
+    if (typeof document !== 'undefined') {
+      setIsBannerActive(document.documentElement.classList.contains('has-announcement-banner'));
+    }
   });
+
+  // Also check on mount and periodially to handle direct state changes
+  React.useEffect(() => {
+    const checkBanner = () => {
+      if (typeof document !== 'undefined') {
+        setIsBannerActive(document.documentElement.classList.contains('has-announcement-banner'));
+      }
+    };
+    checkBanner();
+    const interval = setInterval(checkBanner, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   const [mounted, setMounted] = React.useState(false);
 
@@ -246,10 +265,12 @@ export function Navbar() {
 
   return (
     <motion.nav
-      style={{ backgroundColor, backdropFilter, boxShadow: shadow }}
+      style={!isBannerActive ? { backgroundColor, backdropFilter, boxShadow: shadow } : {}}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 flex items-center pt-[safe-area-inset-top]",
-        isScrolled ? "h-20" : "h-[88px]"
+        "fixed left-0 right-0 z-50 transition-all duration-300 flex items-center pt-[safe-area-inset-top]",
+        "top-0 [.has-announcement-banner_&]:top-[52px]", // Dynamic top based on banner height
+        isBannerActive ? "bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]" : "",
+        (isScrolled || isBannerActive) ? "h-20" : "h-[88px]"
       )}
     >
       {/* Background layer for mobile contrast at the top */}
@@ -271,7 +292,7 @@ export function Navbar() {
           <div className="flex flex-col">
             <span className={cn(
               "text-xl font-serif font-black tracking-tight transition-colors duration-300",
-              isScrolled ? "text-deep-blue" : "text-white"
+              (isScrolled || isBannerActive) ? "text-deep-blue" : "text-white"
             )}>
               VidyaBharati
             </span>
@@ -283,7 +304,7 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-8">
           <nav className="flex items-center gap-8 mr-4">
             {navLinks.map((link) => (
-              <DesktopNavItem key={link.name} link={link} isScrolled={isScrolled} pathname={pathname} />
+              <DesktopNavItem key={link.name} link={link} isScrolled={isScrolled || isBannerActive} pathname={pathname} />
             ))}
           </nav>
           
@@ -294,7 +315,7 @@ export function Navbar() {
                 size="md" 
                 className={cn(
                   "border font-black uppercase tracking-widest text-[10px] transition-all duration-300 shadow-none bg-transparent h-11 px-8 rounded-xl",
-                  isScrolled 
+                  (isScrolled || isBannerActive) 
                     ? "border-deep-blue text-deep-blue hover:bg-slate-50" 
                     : "border-white/30 text-white hover:bg-white/10 hover:border-white"
                 )}
@@ -326,6 +347,8 @@ export function Navbar() {
             isScrolled ? "bg-slate-100 text-slate-900 shadow-sm" : "bg-white/20 text-white backdrop-blur-md"
           )}
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isOpen}
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>

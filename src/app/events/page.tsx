@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import eventsHero from "@/assets/empowering generation through education.png";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const sampleEvents = [
   {
@@ -31,43 +32,32 @@ const sampleEvents = [
     type: "Webinar",
     description: "Join the PAN VBFA Alumni Forum for an Insightful Webinar on Creativity and Innovation! Featured Speaker: Mr. Bharat Iyer Art of Living Corporate Faculty.",
     image: "/images/events/webinar.webp"
-  },
-  {
-    id: 3,
-    title: "LA Charity Gala 2024",
-    date: "DEC 15",
-    time: "15 Dec 2024, 06:00 PM",
-    location: "Los Angeles",
-    type: "Gala",
-    description: "An evening of inspiration and fundraising in the heart of Los Angeles. Join us for a special night dedicated to rural education.",
-    image: "/images/events/gala.webp"
-  },
-  {
-    id: 4,
-    title: "Boston Education Summit",
-    date: "JAN 10",
-    time: "10 Jan 2025, 09:00 AM",
-    location: "Boston",
-    type: "Summit",
-    description: "A gathering of educators, donors, and visionaries in Boston to discuss sustainable development in rural Indian schools.",
-    image: "/images/events/summit.webp"
-  },
-  {
-    id: 5,
-    title: "Houston Community Meetup",
-    date: "FEB 05",
-    time: "05 Feb 2025, 05:00 PM",
-    location: "Houston",
-    type: "Meetup",
-    description: "Connecting our Houston community with impact stories from the ground. A chance to network and share our collective vision.",
-    image: "/images/events/meetup.webp"
   }
 ];
+
+const eventSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": sampleEvents.map((event, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "Event",
+      "name": event.title,
+      "description": event.description,
+      "startDate": "2024-11-02", 
+      "location": {
+        "@type": "Place",
+        "name": event.location
+      }
+    }
+  }))
+};
 
 export default function EventsPage() {
   const [activeFilter, setActiveFilter] = React.useState("All");
   
-  const filters = ["All", "Los Angeles", "Boston", "Houston"];
+  const filters = ["All", "Workshop", "Webinar"];
   
   const filteredEvents = activeFilter === "All" 
     ? sampleEvents 
@@ -76,6 +66,7 @@ export default function EventsPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <Navbar />
+      <JsonLd data={eventSchema} />
 
       <PageHero
         tag="Community"

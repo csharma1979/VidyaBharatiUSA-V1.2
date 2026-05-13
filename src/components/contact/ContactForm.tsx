@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { toast } from "react-hot-toast";
 
 const subjects = [
   "General Enquiry",
@@ -40,6 +41,7 @@ export function ContactForm() {
         throw new Error(data.error || "Failed to send message.");
       }
 
+      toast.success("Message sent successfully!");
       setStatus("success");
       setFormData({
         name: "",
@@ -49,6 +51,7 @@ export function ContactForm() {
         message: "",
       });
     } catch (err: any) {
+      toast.error(err.message || "Failed to send message.");
       setStatus("error");
       setErrorMessage(err.message);
     }
@@ -95,7 +98,6 @@ export function ContactForm() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 px-4 focus:outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/5 transition-all font-medium"
-              placeholder="John Doe"
             />
           </div>
           <div className="space-y-2">
@@ -106,7 +108,6 @@ export function ContactForm() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 px-4 focus:outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/5 transition-all font-medium"
-              placeholder="deepak@example.com"
             />
           </div>
         </div>
@@ -119,7 +120,6 @@ export function ContactForm() {
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 px-4 focus:outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/5 transition-all font-medium"
-              placeholder="+1 234 567 890"
             />
           </div>
           <div className="space-y-2">
@@ -144,7 +144,6 @@ export function ContactForm() {
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             className="w-full bg-slate-50 border border-slate-100 rounded-xl py-4 px-4 focus:outline-none focus:border-saffron focus:ring-4 focus:ring-saffron/5 transition-all font-medium resize-none"
-            placeholder="How can we help you?"
           />
         </div>
 

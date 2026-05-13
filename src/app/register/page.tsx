@@ -97,7 +97,6 @@ export default function RegisterPage() {
                         value={formData.firstName}
                         onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                         className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                        placeholder="John"
                       />
                     </div>
                   </div>
@@ -109,7 +108,6 @@ export default function RegisterPage() {
                       value={formData.lastName}
                       onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                      placeholder="Doe"
                     />
                   </div>
                 </div>
@@ -124,7 +122,6 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                      placeholder="john@example.com"
                     />
                   </div>
                 </div>
@@ -139,7 +136,6 @@ export default function RegisterPage() {
                       value={formData.mobile}
                       onChange={(e) => setFormData({...formData, mobile: e.target.value})}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                      placeholder="+1 234 567 890"
                     />
                   </div>
                 </div>
@@ -154,7 +150,6 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                      placeholder="••••••••"
                       minLength={6}
                     />
                   </div>
@@ -168,7 +163,6 @@ export default function RegisterPage() {
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="••••••••"
                   />
                 </div>
 

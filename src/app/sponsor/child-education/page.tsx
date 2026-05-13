@@ -1,5 +1,12 @@
 import { SponsorshipLayout } from "@/components/ui/SponsorshipLayout";
 import supportChildEducation from '@/assets/support child education .png';
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sponsor a Child | Transform a Life | VidyaBharati USA",
+  description: "Directly sponsor a child's education in India. Your support covers tuition, learning kits, and holistic development for underprivileged students.",
+  keywords: ["sponsor a child", "child education sponsorship", "donate for child education", "NGO sponsorship India"],
+};
 
 export default function ChildEducationPage() {
   return (
@@ -7,7 +14,7 @@ export default function ChildEducationPage() {
       heroTitle="Unlock a Child's Potential"
       heroSubtitle="Your sponsorship provides quality education, books, and a brighter future for a child in need."
       heroImage={supportChildEducation}
-      heroImageAlt="Child studying in classroom"
+      heroImageAlt="Young student studying in a Vidya Bharati classroom in India"
       heroLayout="banner"
       purposeTitle="Why Sponsor a Child?"
       purposeDescription="Directly support a student's journey from elementary school to graduation, ensuring financial barriers never stop their dreams."

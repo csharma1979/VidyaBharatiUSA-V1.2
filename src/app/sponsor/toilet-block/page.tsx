@@ -1,5 +1,12 @@
 import { SponsorshipLayout } from "@/components/ui/SponsorshipLayout";
 import toiletBlock from "@/assets/toilet block.png";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sponsor Sanitation | Support Girl Child Education | VidyaBharati USA",
+  description: "Support health and hygiene by sponsoring toilet block construction in rural schools. Helping girls stay in school through better sanitation.",
+  keywords: ["sponsor school toilets", "sanitation charity India", "support girl child education", "water and hygiene NGO"],
+};
 
 export default function ToiletBlockPage() {
   return (

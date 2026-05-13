@@ -1,6 +1,13 @@
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { ProgramCard } from "@/components/ui/ProgramCard";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Our Programs | Educational Initiatives | VidyaBharati USA",
+  description: "Explore VidyaBharati USA's core programs: Shiksha Daan for rural school support and Sanskriti Bodh Pariyojana for cultural and holistic development of children.",
+  keywords: ["Shiksha Daan", "Sanskriti Bodh Pariyojana", "educational programs India", "rural education support", "holistic development"],
+};
 
 const programs = [
   {
@@ -29,10 +36,10 @@ export default function ProgramsPage() {
         
         <div className="container px-6 relative z-10">
           <div className="max-w-3xl">
-            <h1 className="text-sm font-black uppercase tracking-widest text-saffron mb-4">Our Initiatives</h1>
-            <h2 className="text-4xl md:text-6xl font-serif font-black leading-tight mb-6">
+            <p className="text-sm font-black uppercase tracking-widest text-saffron mb-4">Our Initiatives</p>
+            <h1 className="text-4xl md:text-6xl font-serif font-black leading-tight mb-6">
               Building a Foundation for the Future
-            </h2>
+            </h1>
             <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl">
               Explore our core programs designed to provide holistic education, cultural awareness, and essential support to underprivileged children across India.
             </p>

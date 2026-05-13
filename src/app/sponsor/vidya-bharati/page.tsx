@@ -1,5 +1,12 @@
 import { SponsorshipLayout } from "@/components/ui/SponsorshipLayout";
 import supportVidhya from "@/assets/support vidhya.png";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Support Our Mission | Scale Impact | VidyaBharati USA",
+  description: "Support the national mission of VidyaBharati. Your contribution helps scale teacher training, curriculum innovation, and rural outreach across India.",
+  keywords: ["support VidyaBharati", "nonprofit support India", "educational NGO funding", "charity for education scaling"],
+};
 
 export default function SupportVidyaBharatiPage() {
   return (

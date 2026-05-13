@@ -9,24 +9,24 @@ import galleryHero from "@/assets/empowering generation through education.png";
 
 const allImages = [
   // Shiksha Daan
-  { src: "/images/sikshadaan/acedemic_excellence.webp", alt: "Academic Excellence", category: "Shiksha Daan" },
-  { src: "/images/sikshadaan/affordable_education.webp", alt: "Affordable Education", category: "Shiksha Daan" },
-  { src: "/images/sikshadaan/centers.webp", alt: "Learning Centers", category: "Shiksha Daan" },
-  { src: "/images/sikshadaan/schools.webp", alt: "Schools", category: "Shiksha Daan" },
-  { src: "/images/sikshadaan/students.webp", alt: "Students", category: "Shiksha Daan" },
-  { src: "/images/sikshadaan/teachers.webp", alt: "Teachers", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/acedemic_excellence.webp", alt: "Vidya Bharati students showcasing academic excellence", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/affordable_education.webp", alt: "Affordable quality education for rural children in India", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/centers.webp", alt: "Saraswati Shishu Mandir learning centers in remote villages", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/schools.webp", alt: "Vidya Bharati supported school infrastructure in India", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/students.webp", alt: "Underprivileged students learning in a safe environment", category: "Shiksha Daan" },
+  { src: "/images/sikshadaan/teachers.webp", alt: "Dedicated teachers at Vidya Bharati schools", category: "Shiksha Daan" },
   
   // Sanskriti Bodh
-  { src: "/images/sanskritibodh/1000programs.webp", alt: "1000+ Programs", category: "Sanskriti Bodh" },
-  { src: "/images/sanskritibodh/cultural.webp", alt: "Cultural Events", category: "Sanskriti Bodh" },
-  { src: "/images/sanskritibodh/moral_education.webp", alt: "Moral Education", category: "Sanskriti Bodh" },
-  { src: "/images/sanskritibodh/sanskrit.webp", alt: "Sanskrit Learning", category: "Sanskriti Bodh" },
-  { src: "/images/sanskritibodh/students.webp", alt: "Engaged Students", category: "Sanskriti Bodh" },
-  { src: "/images/sanskritibodh/vedic.webp", alt: "Vedic Traditions", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/1000programs.webp", alt: "Cultural preservation programs across India", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/cultural.webp", alt: "Traditional cultural performance by students", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/moral_education.webp", alt: "Value-based moral education classes", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/sanskrit.webp", alt: "Students learning Sanskrit language and traditions", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/students.webp", alt: "Holistic development through cultural activities", category: "Sanskriti Bodh" },
+  { src: "/images/sanskritibodh/vedic.webp", alt: "Preserving Vedic traditions in modern education", category: "Sanskriti Bodh" },
 
   // Events
-  { src: "/images/events/webinar.webp", alt: "Webinar", category: "Events" },
-  { src: "/images/events/workshop.webp", alt: "Workshop", category: "Events" }
+  { src: "/images/events/webinar.webp", alt: "Alumni network webinar on innovation and creativity", category: "Events" },
+  { src: "/images/events/workshop.webp", alt: "Master trainer's workshop for educational excellence", category: "Events" }
 ];
 
 export default function GalleryPage() {

@@ -9,16 +9,37 @@ import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import { PageHero } from "@/components/ui/PageHero";
 import contactHero from "@/assets/Join a global movement for change.png";
+import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact Us | VidyaBharati USA",
-  description: "Get in touch with VidyaBharati USA for support, enquiries, or partnerships to support value-based education in India.",
+  description: "Get in touch with VidyaBharati USA for support, enquiries, or partnerships. Help us support value-based education for underprivileged children in India.",
+  keywords: ["contact VidyaBharati USA", "nonprofit contact", "charity inquiry", "education support India", "volunteer opportunities"],
+};
+
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact VidyaBharati USA",
+  "description": "Contact details for VidyaBharati USA nonprofit organization.",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "VidyaBharati USA",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "info@vidyabharatiusa.org",
+      "url": "https://vidyabharatiusa.org/contact"
+    }
+  }
 };
 
 export default function ContactPage() {
   return (
     <main className="min-h-screen bg-slate-50/50">
       <Navbar />
+      <JsonLd data={contactSchema} />
 
       {/* Hero Section */}
       <PageHero

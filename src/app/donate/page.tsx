@@ -3,11 +3,32 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import DonationForm from "@/components/donation/DonationForm";
 import { Heart, ShieldCheck, Globe } from "lucide-react";
+import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
+
+export const metadata: Metadata = {
+  title: "Donate Now | Support Education in India | VidyaBharati USA",
+  description: "Make a tax-deductible donation to VidyaBharati USA. Your support helps provide quality education, school infrastructure, and holistic development to children in rural India.",
+  keywords: ["donate for education", "nonprofit donation", "tax-deductible charity", "support children education", "Indian education NGO", "501(c)(3) donation"],
+};
+
+const donationSchema = {
+  "@context": "https://schema.org",
+  "@type": "DonateAction",
+  "name": "Donate to VidyaBharati USA",
+  "description": "Support quality education for underprivileged children in India.",
+  "recipient": {
+    "@type": "NGO",
+    "name": "VidyaBharati USA",
+    "url": "https://vidyabharatiusa.org"
+  }
+};
 
 export default function DonatePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
+      <JsonLd data={donationSchema} />
 
       <main className="flex-grow pt-32 pb-20">
         <div className="container mx-auto px-6">

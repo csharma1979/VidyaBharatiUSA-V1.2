@@ -84,7 +84,6 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-[#0A1128]/50 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 transition-all duration-300"
-                  placeholder="admin@vidyabharatiusa.org"
                   required
                 />
               </div>
@@ -107,7 +106,6 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#0A1128]/50 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/50 transition-all duration-300"
-                  placeholder="••••••••"
                   required
                 />
               </div>

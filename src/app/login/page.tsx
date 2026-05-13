@@ -77,7 +77,6 @@ export default function LoginPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value.trim()})}
                     className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="john@example.com"
                   />
                 </div>
               </div>
@@ -98,7 +97,6 @@ export default function LoginPage() {
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="••••••••"
                   />
                 </div>
               </div>

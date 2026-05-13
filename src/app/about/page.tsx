@@ -103,69 +103,54 @@ export default function AboutPage() {
       <section className="section-padding bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 skew-x-12 translate-x-20 -z-0"></div>
         <div className="container px-6 mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            <div className="lg:col-span-5 relative">
-              <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl z-10 border-8 border-white">
-                <Image
-                  src="/images/president-dr-garg.png"
-                  alt="Dr. Surendra Garg"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-saffron/10 rounded-full -z-0"></div>
-              <div className="absolute -top-8 -left-8 w-32 h-32 bg-deep-blue/5 rounded-full -z-0"></div>
+          <div className="max-w-4xl mx-auto space-y-12">
+            <div className="space-y-4 text-center">
+              <h2 className="text-sm font-black uppercase tracking-widest text-saffron">A Personal Note</h2>
+              <h3 className="text-4xl md:text-5xl font-serif font-black text-deep-blue leading-tight">
+                Message from <span className="italic text-saffron">President</span>
+              </h3>
+              <div className="h-1.5 w-24 bg-saffron rounded-full mx-auto"></div>
             </div>
-            
-            <div className="lg:col-span-7 space-y-8">
-              <div className="space-y-4">
-                <h2 className="text-sm font-black uppercase tracking-widest text-saffron">A Personal Note</h2>
-                <h3 className="text-4xl md:text-5xl font-serif font-black text-deep-blue leading-tight">
-                  Message from <span className="italic text-saffron">President</span>
-                </h3>
-                <div className="h-1.5 w-24 bg-saffron rounded-full"></div>
+
+            <div className="space-y-8">
+              <div className="space-y-2 text-center">
+                <h4 className="text-3xl font-bold text-deep-blue">Dr. Surendra Garg</h4>
+                <p className="text-saffron font-bold uppercase tracking-widest text-sm">President, VidyaBharati USA</p>
               </div>
 
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h4 className="text-3xl font-bold text-deep-blue">Dr. Surendra Garg</h4>
-                  <p className="text-saffron font-bold uppercase tracking-widest text-sm">President, VidyaBharati USA</p>
-                </div>
-
-                <div className="text-slate-600 space-y-6 text-lg leading-relaxed">
-                  <p>
-                    Vidya Bharati was established in 1952 in Gorakhpur, Uttar Pradesh. Today it is one of the largest educational NGOs in the world.
-                  </p>
-                  <p>
-                    It imparts education to 3 million students via 11,956 formal schools and 6,084 informal schools.
-                  </p>
-                  <p>
-                    Vidya Bharati operates in remote, border, coastal, and tribal areas where few venture. It provides CBSE/state board curriculum with an emphasis on character building, arts, and health.
-                  </p>
-                  
-                  <div className="bg-slate-50 p-10 rounded-[2.5rem] border-l-8 border-saffron space-y-6 shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-saffron rounded-xl flex items-center justify-center text-white">
-                        <BookOpen className="w-7 h-7" />
-                      </div>
-                      <h5 className="text-2xl font-bold text-deep-blue">
-                        Educational Philosophy
-                      </h5>
+              <div className="text-slate-600 space-y-6 text-lg leading-relaxed">
+                <p>
+                  Vidya Bharati was established in 1952 in Gorakhpur, Uttar Pradesh. Today it is one of the largest educational NGOs in the world.
+                </p>
+                <p>
+                  It imparts education to 3 million students via 11,956 formal schools and 6,084 informal schools.
+                </p>
+                <p>
+                  Vidya Bharati operates in remote, border, coastal, and tribal areas where few venture. It provides CBSE/state board curriculum with an emphasis on character building, arts, and health.
+                </p>
+                
+                <div className="bg-slate-50 p-10 rounded-[2.5rem] border-l-8 border-saffron space-y-6 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-saffron rounded-xl flex items-center justify-center text-white">
+                      <BookOpen className="w-7 h-7" />
                     </div>
-                    
-                    <div className="space-y-4 text-slate-700">
-                      <p>
-                        Vidya Bharati provides the platform for all different subjects up to High Schools. The curriculum and the syllabus are approved by the Central Board of Secondary Education (CBSE) and state boards, as per affiliations of different schools.
+                    <h5 className="text-2xl font-bold text-deep-blue">
+                      Educational Philosophy
+                    </h5>
+                  </div>
+                  
+                  <div className="space-y-4 text-slate-700">
+                    <p>
+                      Vidya Bharati provides the platform for all different subjects up to High Schools. The curriculum and the syllabus are approved by the Central Board of Secondary Education (CBSE) and state boards, as per affiliations of different schools.
+                    </p>
+                    <p>
+                      In addition, we provide education to develop good citizens with national character and deep-rooted values (sanskars).
+                    </p>
+                    <div className="pt-4 border-t border-slate-200">
+                      <p className="font-black text-deep-blue flex items-center gap-3">
+                        <span className="w-2 h-2 bg-saffron rounded-full"></span>
+                        Focus Areas: Academics, Health, Sports, Arts & Music, Ethics, and Character Building.
                       </p>
-                      <p>
-                        In addition, we provide education to develop good citizens with national character and deep-rooted values (sanskars).
-                      </p>
-                      <div className="pt-4 border-t border-slate-200">
-                        <p className="font-black text-deep-blue flex items-center gap-3">
-                          <span className="w-2 h-2 bg-saffron rounded-full"></span>
-                          Focus Areas: Academics, Health, Sports, Arts & Music, Ethics, and Character Building.
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -342,22 +327,27 @@ export default function AboutPage() {
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {[
-              { name: "Dr. Surendra Garg", role: "President, VidyaBharati USA" },
-              { name: "Smt. Neena Gupta", role: "Board Member" },
-              { name: "Shri Rajesh Verma", role: "Director of Operations" },
-              { name: "Dr. Anjali Rao", role: "Education Advisor" }
+              { name: "Dr. Yashpal Arya", role: "Board Member", initials: "YA" },
+              { name: "Mr. Ashok Danda", role: "Board Member", initials: "AD" },
+              { name: "Mr. Satish Jha", role: "Board Member", initials: "SJ" },
+              { name: "Mr. Anil Parekh", role: "Board Member", initials: "AP" },
+              { name: "Mu Suresh Gupta", role: "Board Member", initials: "SG" },
+              { name: "Mr. Ajay Sheth", role: "Board Member", initials: "AS" },
+              { name: "Dr. Chandresh Saraiya", role: "Board Member", initials: "CS" },
+              { name: "Mr. Rajendra Khaitan", role: "Board Member", initials: "RK" }
             ].map((member, i) => (
-              <div key={i} className="space-y-4 text-center">
-                <div className="aspect-[4/5] rounded-[2rem] bg-slate-200 overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-500">
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-300/50">
-                    <Users className="w-12 h-12 text-slate-400" />
+              <div key={i} className="group relative bg-white border border-slate-100 p-8 rounded-[2rem] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden text-center">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full translate-x-12 -translate-y-12 group-hover:bg-saffron/10 transition-colors"></div>
+                <div className="relative z-10 space-y-6">
+                  <div className="w-16 h-16 bg-deep-blue/5 text-deep-blue rounded-2xl flex items-center justify-center text-xl font-black mx-auto group-hover:bg-saffron group-hover:text-white transition-all duration-300">
+                    {member.initials}
                   </div>
-                </div>
-                <div>
-                  <h4 className="text-xl font-bold text-deep-blue">{member.name}</h4>
-                  <p className="text-saffron font-bold text-xs uppercase tracking-widest">{member.role}</p>
+                  <div className="space-y-2">
+                    <h4 className="text-xl font-bold text-deep-blue group-hover:text-saffron transition-colors">{member.name}</h4>
+                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">{member.role}</p>
+                  </div>
                 </div>
               </div>
             ))}

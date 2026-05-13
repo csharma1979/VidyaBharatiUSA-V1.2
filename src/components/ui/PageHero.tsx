@@ -68,46 +68,49 @@ export function PageHero({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              aria-label="Breadcrumb"
               className={`flex items-center space-x-2 text-slate-300/80 text-sm font-medium mb-4 ${centered ? "justify-center" : "justify-start"}`}
             >
-              {breadcrumbs.map((item, index) => (
-                <React.Fragment key={index}>
-                  {item.href ? (
-                    <Link href={item.href} className="hover:text-saffron transition-colors">
-                      {item.label}
-                    </Link>
-                  ) : (
-                    <span className="text-white">{item.label}</span>
-                  )}
-                  {index < breadcrumbs.length - 1 && (
-                    <ChevronRight className="w-4 h-4 text-slate-500" />
-                  )}
-                </React.Fragment>
-              ))}
+              <ol className="flex items-center space-x-2 list-none p-0 m-0">
+                {breadcrumbs.map((item, index) => (
+                  <li key={index} className="flex items-center">
+                    {item.href ? (
+                      <Link href={item.href} className="hover:text-saffron transition-colors">
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <span className="text-white" aria-current="page">{item.label}</span>
+                    )}
+                    {index < breadcrumbs.length - 1 && (
+                      <ChevronRight className="w-4 h-4 text-slate-500 mx-2" aria-hidden="true" />
+                    )}
+                  </li>
+                ))}
+              </ol>
             </motion.nav>
           )}
 
           {/* Tag */}
           {tag && (
-            <motion.h1 
+            <motion.p 
               initial={{ opacity: 0, x: centered ? 0 : -20, y: centered ? -10 : 0 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
               transition={{ duration: 0.6 }}
               className={`text-sm font-black uppercase tracking-[0.3em] text-saffron ${centered ? "text-center" : "text-left"}`}
             >
               {tag}
-            </motion.h1>
+            </motion.p>
           )}
 
           {/* Main Title */}
-          <motion.h2 
+          <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
             className={`text-5xl md:text-7xl font-serif font-black text-white leading-[1.1] tracking-tighter ${centered ? "text-center" : "text-left"}`}
           >
             {title}
-          </motion.h2>
+          </motion.h1>
 
           {/* Subtitle */}
           <motion.p 

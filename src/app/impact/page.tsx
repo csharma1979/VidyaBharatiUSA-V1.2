@@ -22,11 +22,28 @@ import {
   FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { JsonLd } from "@/components/seo/JsonLd";
+
+const impactSchema = {
+  "@context": "https://schema.org",
+  "@type": "Report",
+  "name": "VidyaBharati USA Impact Report",
+  "author": {
+    "@type": "NGO",
+    "name": "VidyaBharati USA"
+  },
+  "description": "Evidence of change and educational impact achieved by VidyaBharati USA across rural India.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "VidyaBharati USA"
+  }
+};
 
 export default function ImpactPage() {
   return (
     <main className="relative min-h-screen bg-white">
       <Navbar />
+      <JsonLd data={impactSchema} />
 
       {/* Hero Section */}
       <section className="relative min-h-[400px] flex items-center overflow-hidden py-[80px] md:py-[120px]">

@@ -3,6 +3,12 @@ import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
 import { notFound } from "next/navigation";
 import { Printer, ShieldCheck, Heart } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Donation Receipt | VidyaBharati USA",
+  robots: { index: false, follow: false },
+};
 
 export default async function ReceiptPage({ params }: { params: { id: string } }) {
   await connectToDB();
