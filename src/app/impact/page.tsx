@@ -207,21 +207,18 @@ export default function ImpactPage() {
                 rank: "19",
                 school: "SSVMIC, Shikarpur, Bulandshahr",
                 region: "Meerut",
-                image: "/images/default-avatar-man.png"
               },
               {
                 name: "Saket Singh",
                 rank: "65",
                 school: "Jwala Devi Saraswati Vidya Mandir, Civil Lines, Prayagraj",
                 region: "Kashi",
-                image: "/images/default-avatar-man.png"
               },
               {
                 name: "Ashutosh Mishra",
                 rank: "198",
                 school: "Saraswati Shishu Mandir, Chattarpur",
                 region: "Mahakoshal",
-                image: "/images/default-avatar-man.png"
               }
             ].map((topper, idx) => (
               <motion.div
@@ -229,29 +226,20 @@ export default function ImpactPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-500"
+                className="group relative bg-white rounded-[2.5rem] p-8 shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-500"
               >
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <Image 
-                    src={topper.image} 
-                    alt={topper.name} 
-                    fill 
-                    className="object-cover group-hover:scale-110 transition-transform duration-700" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-deep-blue/80 via-transparent to-transparent"></div>
-                  <div className="absolute top-6 right-6">
-                    <div className="bg-saffron text-white h-16 w-16 rounded-full flex flex-col items-center justify-center shadow-xl border-2 border-white/50 backdrop-blur-sm">
-                      <span className="text-[10px] font-black uppercase tracking-tight leading-none">Rank</span>
-                      <span className="text-2xl font-black">{topper.rank}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-8 space-y-4">
+                <div className="flex justify-between items-start mb-6">
                   <div className="space-y-1">
                     <div className="text-xs font-black uppercase tracking-[0.2em] text-saffron">{topper.region}</div>
                     <h4 className="text-2xl font-black text-deep-blue">{topper.name}</h4>
                   </div>
+                  <div className="bg-saffron/10 text-saffron px-4 py-2 rounded-2xl flex flex-col items-center justify-center min-w-[70px]">
+                    <span className="text-[10px] font-black uppercase leading-none mb-1">Rank</span>
+                    <span className="text-xl font-black">{topper.rank}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
                   <div className="flex gap-3">
                     <Award className="w-5 h-5 text-saffron shrink-0" />
                     <p className="text-sm text-slate-600 leading-relaxed font-medium">
