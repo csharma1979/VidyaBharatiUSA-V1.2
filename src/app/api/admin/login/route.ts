@@ -50,8 +50,8 @@ export async function POST(req: Request) {
       name: "admin_auth_token",
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false, // Set to false to allow login on non-HTTPS production environments (IP/HTTP)
+      sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24 hours
       path: "/",
     });
