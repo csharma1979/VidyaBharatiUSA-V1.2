@@ -5,9 +5,10 @@ import { getAdminSession } from "@/lib/auth";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAdminSession();
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,7 +26,7 @@ export async function PATCH(
     }
 
     const enquiry = await Enquiry.findByIdAndUpdate(
-      params.id,
+      id,
       { status },
       { new: true }
     );
@@ -49,16 +50,17 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAdminSession();
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectToDB();
-    const enquiry = await Enquiry.findByIdAndDelete(params.id);
+    const enquiry = await Enquiry.findByIdAndDelete(id);
 
     if (!enquiry) {
       return NextResponse.json(

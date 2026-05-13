@@ -10,9 +10,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ReceiptPage({ params }: { params: { id: string } }) {
+export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   await connectToDB();
-  const donation = await Donation.findById(params.id);
+  const donation = await Donation.findById(id);
 
   if (!donation || donation.paymentStatus !== "success") {
     return notFound();
