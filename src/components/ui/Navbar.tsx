@@ -267,8 +267,8 @@ export function Navbar() {
     <motion.nav
       style={!isBannerActive ? { backgroundColor, backdropFilter, boxShadow: shadow } : {}}
       className={cn(
-        "fixed left-0 right-0 z-50 transition-all duration-300 flex items-center pt-[safe-area-inset-top]",
-        "top-0 [.has-announcement-banner_&]:top-[52px]", // Dynamic top based on banner height
+        "fixed left-0 right-0 z-[80] transition-all duration-300 flex items-center pt-[safe-area-inset-top]",
+        (isBannerActive && !isScrolled) ? "top-[52px]" : "top-0",
         isBannerActive ? "bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)]" : "",
         (isScrolled || isBannerActive) ? "h-20" : "h-[88px]"
       )}
@@ -309,7 +309,7 @@ export function Navbar() {
           </nav>
           
           <div className="flex items-center gap-4 border-l border-slate-200/20 pl-8">
-            <Link href="https://www.vidyabharatialumni.org/user/login.dz" target="_blank" rel="noopener noreferrer">
+            <Link href="/alumni">
               <Button 
                 variant="secondary" 
                 size="md" 
@@ -320,7 +320,7 @@ export function Navbar() {
                     : "border-white/30 text-white hover:bg-white/10 hover:border-white"
                 )}
               >
-                Alumni Login
+                Alumni
               </Button>
             </Link>
             
@@ -387,9 +387,9 @@ export function Navbar() {
                 </nav>
 
                 <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col gap-4">
-                  <Link href="https://www.vidyabharatialumni.org/home.dz" target="_blank" rel="noopener noreferrer">
+                  <Link href="/alumni" onClick={() => setIsOpen(false)}>
                     <Button variant="secondary" size="lg" className="w-full h-14 font-black uppercase tracking-widest text-xs border-slate-200">
-                      Alumni Login
+                      Alumni
                     </Button>
                   </Link>
                   <Link href="/donate">
