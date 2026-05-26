@@ -11,41 +11,122 @@ import {
   TrendingUp,
   Loader2,
   Users,
-  GraduationCap
+  GraduationCap,
+  X,
+  CheckCircle,
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function UserDashboard() {
   const [donations, setDonations] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [donationsRes, profileRes] = await Promise.all([
-          fetch("/api/donations/user"),
-          fetch("/api/user/profile")
-        ]);
-        
-        if (donationsRes.ok) {
-          const donationsData = await donationsRes.ok ? await donationsRes.json() : [];
-          setDonations(donationsData);
-        }
-        
-        if (profileRes.ok) {
-          const profileData = await profileRes.json();
-          setUser(profileData);
-        }
-      } catch (err) {
-        console.error("Failed to load dashboard data:", err);
-      } finally {
-        setIsLoading(false);
+  // Donation Selector States
+  const [donationStep, setDonationStep] = useState<"idle" | "amount" | "processing">("idle");
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(100);
+  const [customAmount, setCustomAmount] = useState("");
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCancelBanner, setShowCancelBanner] = useState(false);
+
+  async function fetchDashboardData() {
+    try {
+      const [donationsRes, profileRes] = await Promise.all([
+        fetch("/api/donations/user"),
+        fetch("/api/user/profile")
+      ]);
+      
+      if (donationsRes.ok) {
+        const donationsData = await donationsRes.json();
+        setDonations(donationsData);
       }
+      
+      if (profileRes.ok) {
+        const profileData = await profileRes.json();
+        setUser(profileData);
+      }
+    } catch (err) {
+      console.error("Failed to load dashboard data:", err);
     }
-    fetchData();
+  }
+
+  useEffect(() => {
+    async function loadData() {
+      setIsLoading(true);
+      await fetchDashboardData();
+      setIsLoading(false);
+    }
+    loadData();
   }, []);
+
+  // Handle URL redirect query parameters from Stripe checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") {
+      setShowSuccessModal(true);
+      window.history.replaceState({}, "", "/dashboard");
+      
+      // Initial refresh for donation table
+      setTimeout(() => {
+        fetchDashboardData();
+      }, 1000);
+      
+      // Secondary polling in case of minor webhook processing delay
+      setTimeout(() => {
+        fetchDashboardData();
+      }, 3500);
+    } else if (params.get("canceled") === "true") {
+      setShowCancelBanner(true);
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, []);
+
+  const handleProceedToPayment = async () => {
+    const finalAmount = customAmount ? parseFloat(customAmount) : selectedAmount;
+    if (!finalAmount || finalAmount <= 0) {
+      setPaymentError("Please select or enter a valid donation amount.");
+      return;
+    }
+
+    setDonationStep("processing");
+    setPaymentError(null);
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: finalAmount,
+          firstName: user?.firstName || "Donor",
+          lastName: user?.lastName || "Account",
+          email: user?.email,
+          userId: user?._id || user?.userId,
+          isGuest: false,
+          successUrl: `${window.location.origin}/dashboard?success=true`,
+          cancelUrl: `${window.location.origin}/dashboard?canceled=true`
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create payment session.");
+      }
+
+      if (!data.url) {
+        throw new Error("No checkout URL returned from payment server.");
+      }
+
+      // Redirect to Stripe checkout
+      window.location.href = data.url;
+    } catch (err: any) {
+      setPaymentError(err.message || "Something went wrong. Please try again.");
+      setDonationStep("amount");
+    }
+  };
 
   const totalDonated = donations.length > 0 ? donations.reduce((sum, d) => sum + d.amount, 0) : 0;
   const livesImpacted = Math.floor(totalDonated / 100);
@@ -60,7 +141,30 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
+    <div className="space-y-10 animate-in fade-in duration-700 relative">
+      {/* Cancellation Banner */}
+      <AnimatePresence>
+        {showCancelBanner && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-5 bg-amber-50 border border-amber-200 rounded-[20px] flex items-center justify-between text-amber-800 text-sm font-semibold"
+          >
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+              <span>Donation was cancelled. You can retry whenever you are ready!</span>
+            </div>
+            <button 
+              onClick={() => setShowCancelBanner(false)}
+              className="text-amber-600 hover:text-amber-800 text-xs font-black uppercase tracking-wider bg-white px-3 py-1.5 rounded-lg border border-amber-100 shadow-sm"
+            >
+              Dismiss
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Welcome & Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -102,26 +206,129 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* Quick Action Card */}
+        {/* Quick Action Card - Inline Donation Form */}
         <div className="flex flex-col gap-8">
-          <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm grow flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-               <GraduationCap className="w-24 h-24 text-[#0A1128]" />
-            </div>
-            <div>
-              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
-                <ShieldCheck className="w-7 h-7 text-[#D4AF37]" />
+          <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm grow flex flex-col justify-between relative overflow-hidden group min-h-[340px]">
+            {donationStep === "idle" ? (
+              <>
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <GraduationCap className="w-24 h-24 text-[#0A1128]" />
+                </div>
+                <div>
+                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
+                    <ShieldCheck className="w-7 h-7 text-[#D4AF37]" />
+                  </div>
+                  <h3 className="text-xl font-black text-[#0A1128] mb-2 tracking-tight">Support a Child</h3>
+                  <p className="text-gray-500 text-xs leading-relaxed font-medium">
+                    Set up a new contribution to support rural education and skill development programs.
+                  </p>
+                </div>
+                <div className="mt-8">
+                  <button 
+                    onClick={() => setDonationStep("amount")}
+                    className="w-full bg-[#D4AF37] text-[#0A1128] font-black py-4 rounded-2xl shadow-xl shadow-amber-200/50 hover:bg-[#c2a032] hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                  >
+                     Start Donation <TrendingUp className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            ) : donationStep === "amount" ? (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6 flex flex-col justify-between h-full w-full"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-black text-[#0A1128] tracking-tight">Select Amount</h3>
+                    <button 
+                      onClick={() => {
+                        setDonationStep("idle");
+                        setPaymentError(null);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 text-xs font-bold transition-colors flex items-center gap-1"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" /> Back
+                    </button>
+                  </div>
+                  <p className="text-gray-500 text-xs leading-relaxed font-medium mb-6">
+                    Choose a predefined tier or enter a custom contribution.
+                  </p>
+
+                  {/* Predefined Amounts */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {[100, 250, 500].map((amount) => (
+                      <button
+                        key={amount}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAmount(amount);
+                          setCustomAmount("");
+                          setPaymentError(null);
+                        }}
+                        className={`py-3.5 rounded-xl border-2 text-center transition-all duration-200 ${
+                          selectedAmount === amount && !customAmount
+                            ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] font-black shadow-sm"
+                            : "border-gray-100 hover:border-[#D4AF37]/30 text-gray-500 font-bold"
+                        }`}
+                      >
+                        <span className="text-sm block">${amount}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Custom Amount */}
+                  <div className="relative mb-4">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="Custom Amount"
+                      value={customAmount}
+                      onChange={(e) => {
+                        setCustomAmount(e.target.value);
+                        setSelectedAmount(null);
+                        setPaymentError(null);
+                      }}
+                      className={`w-full py-3.5 pl-8 pr-4 rounded-xl border-2 text-sm transition-all focus:outline-none focus:border-[#D4AF37] ${
+                        customAmount 
+                          ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] font-bold" 
+                          : "border-gray-100 text-gray-600 font-medium"
+                      }`}
+                    />
+                  </div>
+
+                  {paymentError && (
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600 text-xs font-semibold mb-4 animate-shake">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{paymentError}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={handleProceedToPayment}
+                    className="w-full bg-[#0A1128] text-white py-4 rounded-2xl font-black text-sm hover:bg-[#1a2b5e] hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-xl shadow-slate-100"
+                  >
+                    Proceed to Payment <ArrowUpRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDonationStep("idle");
+                      setPaymentError(null);
+                    }}
+                    className="w-full bg-gray-50 text-gray-400 py-3 rounded-2xl font-bold text-xs hover:bg-gray-100 hover:text-gray-600 transition-all text-center"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4 my-auto w-full">
+                <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Preparing Payment Gateway...</p>
               </div>
-              <h3 className="text-xl font-black text-[#0A1128] mb-2 tracking-tight">Support a Child</h3>
-              <p className="text-gray-500 text-xs leading-relaxed font-medium">
-                Set up a new contribution to support rural education and skill development programs.
-              </p>
-            </div>
-            <Link href="/donate" className="mt-8">
-              <button className="w-full bg-[#D4AF37] text-[#0A1128] font-black py-4 rounded-2xl shadow-xl shadow-amber-200/50 hover:bg-[#c2a032] hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
-                 Start Donation <TrendingUp className="w-4 h-4" />
-              </button>
-            </Link>
+            )}
           </div>
         </div>
       </div>
@@ -214,6 +421,55 @@ export default function UserDashboard() {
             </p>
          </div>
       </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-[32px] p-8 md:p-12 max-w-md w-full text-center space-y-6 relative overflow-hidden shadow-2xl border border-gray-100"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-[#D4AF37]" />
+              <button 
+                onClick={() => setShowSuccessModal(false)}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-50 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle className="w-10 h-10" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-3xl font-serif font-black text-[#0A1128] tracking-tight">Thank You!</h3>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed">
+                  Your donation was processed successfully. 
+                  Thank you for supporting rural education and creating lasting impact!
+                </p>
+              </div>
+
+              <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/50 flex items-center justify-between text-left">
+                <div>
+                  <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-0.5">Tax Deductible</p>
+                  <p className="text-xs font-semibold text-emerald-800 leading-tight">A receipt has been sent to your email.</p>
+                </div>
+                <Heart className="w-5 h-5 text-emerald-500 fill-emerald-500" />
+              </div>
+
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full bg-[#0A1128] text-white py-4 rounded-2xl font-black text-sm hover:bg-[#1a2b5e] transition-all shadow-xl shadow-slate-200"
+              >
+                Back to Dashboard
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

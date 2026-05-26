@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { amount, firstName, lastName, email, userId, isGuest } = await req.json();
+        const { amount, firstName, lastName, email, userId, isGuest, successUrl, cancelUrl } = await req.json();
 
     // 1. Validate required fields
     if (!amount || !email || !firstName || !lastName) {
@@ -86,8 +86,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: "payment",
-      success_url: `${origin}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/donate?canceled=true`,
+      success_url: successUrl || `${origin}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${origin}/donate?canceled=true`,
       customer_email: email,
       metadata: {
         donationId: donation._id.toString(),
