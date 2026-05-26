@@ -16,7 +16,7 @@ export function AdminFooter() {
             System Online
           </div>
           <p className="text-xs font-medium text-gray-400">
-            © {currentYear} VidyaBharati USA. <span className="hidden md:inline">Registered 501(c)(3) Nonprofit.</span>
+            © {currentYear} Vidya Bharati USA. <span className="hidden md:inline">Registered 501(c)(3) Nonprofit.</span>
           </p>
         </div>
 

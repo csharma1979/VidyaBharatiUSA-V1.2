@@ -294,7 +294,7 @@ export function Navbar() {
               "text-xl font-serif font-black tracking-tight transition-colors duration-300",
               (isScrolled || isBannerActive) ? "text-deep-blue" : "text-white"
             )}>
-              VidyaBharati
+              Vidya Bharati
             </span>
             <span className="text-[10px] uppercase font-black tracking-[0.4em] text-saffron">USA</span>
           </div>

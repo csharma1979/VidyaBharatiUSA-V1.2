@@ -13,11 +13,19 @@ import {
   TrendingUp,
   Clock,
   CheckCircle2,
-  XCircle
+  XCircle,
+  X,
+  Copy,
+  Check,
+  Trash2
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface Donation {
   _id: string;
+  donationId?: string;
+  userId?: string | null;
   email: string;
   firstName: string;
   lastName: string;
@@ -25,6 +33,7 @@ interface Donation {
   currency: string;
   paymentStatus: string;
   paymentMethod?: string;
+  stripeSessionId?: string;
   isGuest: boolean;
   createdAt: string;
 }
@@ -34,6 +43,41 @@ export default function AdminDonationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [donationToDelete, setDonationToDelete] = useState<Donation | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleDeleteDonation = async () => {
+    if (!donationToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/donations?id=${donationToDelete._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete donation");
+      
+      setDonations(prev => prev.filter(d => d._id !== donationToDelete._id));
+      
+      if (selectedDonation?._id === donationToDelete._id) {
+        setSelectedDonation(null);
+      }
+      
+      setDonationToDelete(null);
+      toast.success("Donation deleted successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete donation");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     fetchDonations();
@@ -207,9 +251,21 @@ export default function AdminDonationsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-[#D4AF37] hover:underline font-bold text-xs flex items-center gap-1">
-                          View details <ArrowUpRight className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => setSelectedDonation(donation)}
+                            className="text-[#D4AF37] hover:underline font-bold text-xs flex items-center gap-1 hover:text-amber-600 transition-colors"
+                          >
+                            View details <ArrowUpRight className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={() => setDonationToDelete(donation)}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1 rounded hover:bg-red-50"
+                            title="Delete donation"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -225,6 +281,258 @@ export default function AdminDonationsPage() {
           </div>
         </div>
       )}
+
+      {/* Donation Details Drawer */}
+      <AnimatePresence>
+        {selectedDonation && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedDonation(null)}
+              className="fixed inset-0 bg-black z-50 cursor-pointer"
+            />
+
+            {/* Slide-over Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-white shadow-2xl z-50 overflow-y-auto flex flex-col border-l border-gray-100"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A1128]">Donation Details</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">ID: {selectedDonation.donationId || selectedDonation._id}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedDonation(null)}
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-8 flex-grow">
+                {/* Amount and Status Hero Section */}
+                <div className="text-center py-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                    selectedDonation.paymentStatus === "success" 
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-100" 
+                      : selectedDonation.paymentStatus === "pending"
+                      ? "bg-amber-50 text-amber-700 border border-amber-100"
+                      : "bg-red-50 text-red-700 border border-red-100"
+                  }`}>
+                    {selectedDonation.paymentStatus === "success" && <CheckCircle2 className="w-3.5 h-3.5" />}
+                    {selectedDonation.paymentStatus === "pending" && <Clock className="w-3.5 h-3.5" />}
+                    {selectedDonation.paymentStatus === "failed" && <XCircle className="w-3.5 h-3.5" />}
+                    {selectedDonation.paymentStatus.toUpperCase()}
+                  </span>
+                  
+                  <div>
+                    <div className="text-4xl font-black text-[#0A1128]">
+                      ${selectedDonation.amount.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+                      {selectedDonation.currency}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Donor Information */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">
+                    Donor Information
+                  </h4>
+                  
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">First Name</p>
+                      <p className="font-semibold text-[#0A1128] mt-0.5">{selectedDonation.firstName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">Last Name</p>
+                      <p className="font-semibold text-[#0A1128] mt-0.5">{selectedDonation.lastName}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-xs text-gray-400 font-medium">Email Address</p>
+                      <div className="flex items-center justify-between mt-0.5 group">
+                        <p className="font-semibold text-[#0A1128]">{selectedDonation.email}</p>
+                        <button
+                          onClick={() => copyToClipboard(selectedDonation.email, "email")}
+                          className="text-xs text-gray-400 hover:text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                          title="Copy Email"
+                        >
+                          {copiedField === "email" ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">Donor Type</p>
+                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-md border mt-1.5 ${
+                        selectedDonation.isGuest 
+                          ? "text-purple-600 bg-purple-50 border-purple-100" 
+                          : "text-blue-600 bg-blue-50 border-blue-100"
+                      }`}>
+                        {selectedDonation.isGuest ? "GUEST DONOR" : "REGISTERED USER"}
+                      </span>
+                    </div>
+                    {selectedDonation.userId && (
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium">User ID</p>
+                        <p className="font-mono text-xs text-[#0A1128] mt-1 break-all bg-gray-50 p-1.5 rounded border border-gray-100">
+                          {selectedDonation.userId}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Transaction Information */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2">
+                    Payment Details
+                  </h4>
+                  
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">Payment Method</p>
+                      <p className="font-semibold text-[#0A1128] mt-0.5 capitalize">
+                        {selectedDonation.paymentMethod || "Stripe Card"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-medium">Transaction Date</p>
+                      <p className="font-semibold text-[#0A1128] mt-0.5">
+                        {new Date(selectedDonation.createdAt).toLocaleString(undefined, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
+                      </p>
+                    </div>
+                    {selectedDonation.stripeSessionId && (
+                      <div className="col-span-2">
+                        <p className="text-xs text-gray-400 font-medium">Stripe Session ID</p>
+                        <div className="flex items-center justify-between mt-1 bg-gray-50 p-2 rounded border border-gray-100 group">
+                          <p className="font-mono text-xs text-[#0A1128] truncate max-w-[90%]">
+                            {selectedDonation.stripeSessionId}
+                          </p>
+                          <button
+                            onClick={() => copyToClipboard(selectedDonation.stripeSessionId!, "stripeSessionId")}
+                            className="text-xs text-gray-400 hover:text-[#D4AF37] transition-colors p-1"
+                            title="Copy Stripe Session ID"
+                          >
+                            {copiedField === "stripeSessionId" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {selectedDonation.donationId && (
+                      <div className="col-span-2">
+                        <p className="text-xs text-gray-400 font-medium">Donation ID</p>
+                        <div className="flex items-center justify-between mt-1 bg-gray-50 p-2 rounded border border-gray-100 group">
+                          <p className="font-mono text-xs text-[#0A1128] truncate max-w-[90%]">
+                            {selectedDonation.donationId}
+                          </p>
+                          <button
+                            onClick={() => copyToClipboard(selectedDonation.donationId!, "donationId")}
+                            className="text-xs text-gray-400 hover:text-[#D4AF37] transition-colors p-1"
+                            title="Copy Donation ID"
+                          >
+                            {copiedField === "donationId" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <button
+                  onClick={() => setDonationToDelete(selectedDonation)}
+                  className="px-4 py-2.5 border border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-all flex items-center gap-1.5"
+                >
+                  <Trash2 className="w-4 h-4" /> Delete Payment
+                </button>
+                <button
+                  onClick={() => setSelectedDonation(null)}
+                  className="px-6 py-2.5 bg-[#0A1128] text-white rounded-xl text-sm font-bold hover:bg-[#1a2b5e] transition-all shadow-sm"
+                >
+                  Close details
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {donationToDelete && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isDeleting && setDonationToDelete(null)}
+              className="fixed inset-0 bg-black z-[60] cursor-default"
+            />
+
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 m-auto w-full max-w-md h-fit bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 z-[60] space-y-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#0A1128]">Delete Donation Record</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Are you sure you want to delete this donation from the system? This will permanently remove the record for{" "}
+                    <span className="font-semibold text-gray-700">
+                      {donationToDelete.firstName} {donationToDelete.lastName} (${donationToDelete.amount.toLocaleString()})
+                    </span>. This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setDonationToDelete(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteDonation}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all flex items-center gap-1.5 shadow-md shadow-red-500/10 disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                    </>
+                  ) : (
+                    "Delete Permanently"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

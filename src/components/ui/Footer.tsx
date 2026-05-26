@@ -50,7 +50,7 @@ export function Footer() {
                   className="object-contain"
                 />
               </div>
-              <span className="text-2xl font-bold tracking-tight">VidyaBharati <span className="text-saffron">USA</span></span>
+              <span className="text-2xl font-bold tracking-tight">Vidya Bharati <span className="text-saffron">USA</span></span>
             </Link>
             <p className="text-slate-300 max-w-sm leading-relaxed">
               Empowering underprivileged children in India through quality education, 
@@ -96,7 +96,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-slate-400 text-xs">
-          <p>© {new Date().getFullYear()} VidyaBharati USA. All rights reserved. Registered 501(c)(3) Nonprofit.</p>
+          <p>© {new Date().getFullYear()} Vidya Bharati USA. All rights reserved. Registered 501(c)(3) Nonprofit.</p>
           <div className="flex space-x-6">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
