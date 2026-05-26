@@ -19,7 +19,7 @@ const scheduleData = [
 
 export function ProgramEventInfo() {
   const [showPopup, setShowPopup] = useState(false);
-  const [showBanner, setShowBanner] = useState(true);
+  const [showBanner, setShowBanner] = useState(false);
 
   // Listen for custom event to show the detailed popup from other components (like Hero)
   useEffect(() => {
@@ -50,40 +50,7 @@ export function ProgramEventInfo() {
 
   return (
     <>
-      {/* 1. Top Announcement Banner - Now visible across all pages by default */}
-      <AnimatePresence>
-        {showBanner && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="relative z-[70] bg-gradient-to-r from-deep-blue via-[#0a1b44] to-deep-blue text-white overflow-hidden"
-          >
-            <div className="container px-6 py-3 flex items-center justify-center gap-4 text-center">
-              <div className="flex items-center gap-2 text-xs md:text-sm font-black uppercase tracking-widest">
-                <span className="bg-saffron text-deep-blue px-2 py-0.5 rounded font-black">Upcoming</span>
-                <span className="hidden sm:inline">VidyaBharati USA July 2026 Tour</span>
-                <span className="sm:hidden">USA July Tour</span>
-              </div>
-              <div className="h-4 w-px bg-white/20 hidden md:block"></div>
-              <button 
-                onClick={() => setShowPopup(true)}
-                className="text-xs md:text-sm font-bold text-saffron hover:text-white transition-colors flex items-center gap-1 group">
-                View Event Details
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button 
-                onClick={closeBanner}
-                className="absolute right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer z-[80]"
-              >
-                <X className="w-4 h-4 text-white/60" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 2. Detailed Schedule Popup Overlay */}
+      {/* Detailed Schedule Popup Overlay */}
       <AnimatePresence>
         {showPopup && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
