@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Lock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Loader2, Lock, AlertCircle, CheckCircle, ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 
@@ -86,7 +86,7 @@ function ResetPasswordForm() {
       {success ? (
         <div className="space-y-6 text-center py-4">
           <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-10 h-10" />
+            <CheckCircle className="w-10 h-10" />
           </div>
           <div className="space-y-2">
             <h3 className="text-xl font-bold text-[#0A1128]">Password Reset Success</h3>

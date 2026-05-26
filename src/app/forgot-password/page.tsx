@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Loader2, Mail, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 
@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
             {success ? (
               <div className="space-y-6 text-center py-4">
                 <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-10 h-10" />
+                  <CheckCircle className="w-10 h-10" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-bold text-[#0A1128]">Check Your Email</h3>
