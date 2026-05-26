@@ -27,6 +27,19 @@ export async function verifyToken(token: string) {
     return null;
   }
 }
+
+export async function signResetToken(payload: { email: string }) {
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined in environment variables");
+  }
+
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(key);
+}
+
 import { cookies } from "next/headers";
 
 export async function getAdminSession() {
