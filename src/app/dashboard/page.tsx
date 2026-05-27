@@ -15,7 +15,8 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Clock
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -463,13 +464,22 @@ export default function UserDashboard() {
                        <span className="text-lg font-black text-[#0A1128]">${donation.amount.toLocaleString()}</span>
                     </td>
                     <td className="px-10 py-8">
-                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                      {donation.paymentStatus === "pending" ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-black rounded-lg border border-amber-100 uppercase tracking-widest">
+                            <Clock className="w-3.5 h-3.5" /> Pending
+                          </span>
+                          <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
+                            Checking payment status...
+                          </p>
+                        </div>
+                      ) : donation.paymentStatus === "failed" ? (
                         <div className="space-y-1">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-lg border border-rose-100 uppercase tracking-widest">
                             <AlertCircle className="w-3.5 h-3.5" /> Failed
                           </span>
                           <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
-                            {donation.failureReason || "Payment not completed."}
+                            {donation.failureReason || "Payment was not successful."}
                           </p>
                         </div>
                       ) : donation.paymentStatus === "refunded" ? (
@@ -507,21 +517,6 @@ export default function UserDashboard() {
         </div>
       </div>
 
-      {/* Impact Story Callout */}
-      <div className="p-10 bg-[#D4AF37] rounded-[40px] flex flex-col md:flex-row items-center gap-10 relative overflow-hidden shadow-2xl shadow-amber-200/20">
-         <div className="absolute top-0 left-0 w-full h-full bg-black/5 opacity-50" />
-         <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[2rem] flex items-center justify-center shrink-0 border border-white/30">
-            <History className="w-10 h-10 text-white" />
-         </div>
-         <div className="relative z-10 space-y-2 text-[#0A1128]">
-            <h4 className="text-2xl font-serif font-black tracking-tight underline decoration-white/30 decoration-thickness-2">The power of your support</h4>
-            <p className="text-sm font-medium leading-relaxed max-w-2xl text-[#0A1128]/70">
-              Each donation you've made helps bridge the gap in rural education. Currently, 
-              your contributions are supporting the digital literacy module for secondary students 
-              in the Sanskriti Bodh program.
-            </p>
-         </div>
-      </div>
 
       {/* Success Modal */}
       <AnimatePresence>

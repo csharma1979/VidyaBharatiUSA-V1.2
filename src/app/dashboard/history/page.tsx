@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ArrowRight,
   AlertCircle,
-  ArrowUpRight
+  ArrowUpRight,
+  Clock
 } from "lucide-react";
 import Link from "next/link";
 
@@ -170,13 +171,22 @@ export default function DonationHistoryPage() {
                        <span className="text-lg font-black text-[#0A1128]">${donation.amount.toLocaleString()}</span>
                     </td>
                       <td className="px-10 py-8">
-                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                      {donation.paymentStatus === "pending" ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-black rounded-lg border border-amber-100 uppercase tracking-widest">
+                            <Clock className="w-3.5 h-3.5" /> Pending
+                          </span>
+                          <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
+                            Checking payment status...
+                          </p>
+                        </div>
+                      ) : donation.paymentStatus === "failed" ? (
                         <div className="space-y-1">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-lg border border-rose-100 uppercase tracking-widest">
                             <AlertCircle className="w-3.5 h-3.5" /> Failed
                           </span>
                           <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
-                            {donation.failureReason || "Payment not completed."}
+                            {donation.failureReason || "Payment was not successful."}
                           </p>
                         </div>
                       ) : donation.paymentStatus === "refunded" ? (

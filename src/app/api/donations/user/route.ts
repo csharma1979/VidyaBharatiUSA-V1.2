@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
+import { reconcileDonation } from "@/lib/reconcile";
 
 export async function GET(req: Request) {
   try {
@@ -22,7 +23,16 @@ export async function GET(req: Request) {
       paymentStatus: { $in: ["success", "failed", "pending", "refunded"] }
     }).sort({ createdAt: -1 });
 
-    return NextResponse.json(donations);
+    const reconciledDonations = await Promise.all(
+      donations.map(async (donation) => {
+        if (donation.paymentStatus === "pending") {
+          return await reconcileDonation(donation);
+        }
+        return donation;
+      })
+    );
+
+    return NextResponse.json(reconciledDonations);
   } catch (error) {
     console.error("Fetch User Donations Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

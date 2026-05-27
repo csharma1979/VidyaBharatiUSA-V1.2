@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ShieldCheck, Heart, AlertTriangle } from "lucide-react";
 import type { Metadata } from "next";
 import PrintButton from "@/components/donation/PrintButton";
+import { reconcileDonation } from "@/lib/reconcile";
 
 export const metadata: Metadata = {
   title: "Donation Receipt | VidyaBharati USA",
@@ -14,7 +15,11 @@ export const metadata: Metadata = {
 export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   await connectToDB();
-  const donation = await Donation.findById(id);
+  let donation = await Donation.findById(id);
+
+  if (donation && donation.paymentStatus === "pending") {
+    donation = await reconcileDonation(donation);
+  }
 
   if (!donation || (donation.paymentStatus !== "success" && donation.paymentStatus !== "refunded")) {
     return notFound();

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
+import { reconcileDonation } from "@/lib/reconcile";
 
 export async function GET() {
   try {
@@ -8,10 +9,18 @@ export async function GET() {
 
     // Fetch all donations, sorted by creation date descending
     const donations = await Donation.find({})
-      .sort({ createdAt: -1 })
-      .lean();
+      .sort({ createdAt: -1 });
 
-    return NextResponse.json(donations);
+    const reconciledDonations = await Promise.all(
+      donations.map(async (donation) => {
+        if (donation.paymentStatus === "pending") {
+          return await reconcileDonation(donation);
+        }
+        return donation;
+      })
+    );
+
+    return NextResponse.json(reconciledDonations);
   } catch (error: any) {
     console.error("Admin Donations API Error:", error);
     return NextResponse.json(
