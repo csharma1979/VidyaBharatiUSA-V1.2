@@ -1,6 +1,8 @@
 import Image from "next/image";
 import whoWeAreImage from '@/assets/who we are.png';
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { Button } from "@/components/ui/Button";
