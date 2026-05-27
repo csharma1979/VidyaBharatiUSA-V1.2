@@ -9,7 +9,9 @@ import {
   Loader2,
   ShieldCheck,
   ChevronLeft,
-  ArrowRight
+  ArrowRight,
+  AlertCircle,
+  ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
 
@@ -41,6 +43,42 @@ export default function DonationHistoryPage() {
     }
     fetchDonations();
   }, []);
+
+  const handleRetryPayment = async (failedDonation: any) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: failedDonation.amount,
+          firstName: failedDonation.firstName,
+          lastName: failedDonation.lastName,
+          email: failedDonation.email,
+          userId: failedDonation.userId,
+          isGuest: false,
+          retryDonationId: failedDonation._id,
+          successUrl: `${window.location.origin}/dashboard?success=true`,
+          cancelUrl: `${window.location.origin}/dashboard?canceled=true`
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to recreate payment session.");
+      }
+
+      if (!data.url) {
+        throw new Error("No checkout URL returned from payment server.");
+      }
+
+      // Redirect to Stripe checkout
+      window.location.href = data.url;
+    } catch (err: any) {
+      setIsLoading(false);
+      alert(err.message || "Something went wrong during payment retry. Please try again.");
+    }
+  };
 
 
   const filteredDonations = donations.filter(d => 
@@ -131,19 +169,43 @@ export default function DonationHistoryPage() {
                     <td className="px-10 py-8">
                        <span className="text-lg font-black text-[#0A1128]">${donation.amount.toLocaleString()}</span>
                     </td>
-                    <td className="px-10 py-8">
-                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg border border-emerald-100 uppercase tracking-widest">
-                         <ShieldCheck className="w-3.5 h-3.5" /> Confirmed
-                       </span>
-                    </td>
-                    <td className="px-10 py-8 text-right">
-                       <Link 
-                        href={`/receipt/${donation._id}`} 
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0A1128]/5 text-[#0A1128] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#0A1128] hover:text-[#D4AF37] transition-all"
-                       >
-                          Download <Download className="w-4 h-4" />
-                       </Link>
-                    </td>
+                      <td className="px-10 py-8">
+                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-lg border border-rose-100 uppercase tracking-widest">
+                            <AlertCircle className="w-3.5 h-3.5" /> Failed
+                          </span>
+                          <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
+                            {donation.failureReason || "Payment not completed."}
+                          </p>
+                        </div>
+                      ) : donation.paymentStatus === "refunded" ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-700 text-[10px] font-black rounded-lg border border-orange-100 uppercase tracking-widest">
+                          <AlertCircle className="w-3.5 h-3.5" /> Refunded
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg border border-emerald-100 uppercase tracking-widest">
+                          <ShieldCheck className="w-3.5 h-3.5" /> Payment Successful
+                        </span>
+                      )}
+                      </td>
+                     <td className="px-10 py-8 text-right">
+                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                        <button 
+                          onClick={() => handleRetryPayment(donation)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#D4AF37] text-[#0A1128] font-black text-[10px] rounded-xl hover:bg-[#c2a032] hover:scale-105 transition-all shadow-sm uppercase tracking-wider"
+                        >
+                           Pay Now <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <Link 
+                         href={`/receipt/${donation._id}`} 
+                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0A1128]/5 text-[#0A1128] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#0A1128] hover:text-[#D4AF37] transition-all"
+                        >
+                           Download <Download className="w-4 h-4" />
+                        </Link>
+                      )}
+                     </td>
                   </tr>
                 ))
               )}

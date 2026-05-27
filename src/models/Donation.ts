@@ -34,7 +34,7 @@ const DonationSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["pending", "success", "failed"],
+      enum: ["pending", "success", "failed", "refunded"],
       default: "pending",
     },
     paymentMethod: {
@@ -44,6 +44,15 @@ const DonationSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
+    },
+    stripePaymentIntentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    failureReason: {
+      type: String,
+      default: null,
     },
     isGuest: {
       type: Boolean,

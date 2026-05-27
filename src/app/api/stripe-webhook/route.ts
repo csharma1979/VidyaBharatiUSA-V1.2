@@ -40,6 +40,9 @@ export async function POST(req: Request) {
       if (donation) {
         donation.paymentStatus = "success";
         donation.paymentMethod = session.payment_method_types?.[0] || "unknown";
+        if (session.payment_intent && typeof session.payment_intent === "string") {
+          donation.stripePaymentIntentId = session.payment_intent;
+        }
         await donation.save();
 
         // Send confirmation email / receipt
@@ -61,6 +64,56 @@ export async function POST(req: Request) {
         } catch (emailErr) {
           console.error("Failed to send donation receipt email:", emailErr);
         }
+      }
+    } else if (event.type === "checkout.session.expired") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      await connectToDB();
+      const donation = await Donation.findOne({ stripeSessionId: session.id });
+      if (donation && donation.paymentStatus === "pending") {
+        donation.paymentStatus = "failed";
+        donation.failureReason = "Checkout session expired";
+        await donation.save();
+      }
+    } else if (event.type === "payment_intent.payment_failed") {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await connectToDB();
+      const donation = await Donation.findOne({
+        $or: [
+          { stripePaymentIntentId: paymentIntent.id },
+          { stripeSessionId: paymentIntent.metadata?.stripeSessionId }
+        ]
+      });
+      if (donation && donation.paymentStatus === "pending") {
+        donation.paymentStatus = "failed";
+        donation.failureReason = paymentIntent.last_payment_error?.message || "Payment attempt failed";
+        await donation.save();
+      }
+    } else if (event.type === "charge.failed") {
+      const charge = event.data.object as Stripe.Charge;
+      await connectToDB();
+      const donation = await Donation.findOne({
+        $or: [
+          { stripePaymentIntentId: charge.payment_intent as string },
+          { stripeSessionId: charge.metadata?.stripeSessionId }
+        ]
+      });
+      if (donation && donation.paymentStatus === "pending") {
+        donation.paymentStatus = "failed";
+        donation.failureReason = charge.failure_message || "Charge failed";
+        await donation.save();
+      }
+    } else if (event.type === "charge.refunded") {
+      const charge = event.data.object as Stripe.Charge;
+      await connectToDB();
+      const donation = await Donation.findOne({
+        $or: [
+          { stripePaymentIntentId: charge.payment_intent as string },
+          { stripeSessionId: charge.metadata?.stripeSessionId }
+        ]
+      });
+      if (donation) {
+        donation.paymentStatus = "refunded";
+        await donation.save();
       }
     }
 

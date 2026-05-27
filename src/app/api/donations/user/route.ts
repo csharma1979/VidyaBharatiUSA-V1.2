@@ -13,13 +13,13 @@ export async function GET(req: Request) {
 
     await connectToDB();
 
-    // Fetch successful donations for this user (including guest donations linked to this email)
+    // Fetch successful, failed, pending, and refunded donations for this user (including guest donations linked to this email)
     const donations = await Donation.find({
       $or: [
         { email },
         { userId: userId || undefined }
       ],
-      paymentStatus: "success"
+      paymentStatus: { $in: ["success", "failed", "pending", "refunded"] }
     }).sort({ createdAt: -1 });
 
     return NextResponse.json(donations);

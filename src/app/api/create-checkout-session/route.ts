@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-        const { amount, firstName, lastName, email, userId, isGuest, successUrl, cancelUrl } = await req.json();
+    const { amount, firstName, lastName, email, userId, isGuest, successUrl, cancelUrl, retryDonationId } = await req.json();
 
     // 1. Validate required fields
     if (!amount || !email || !firstName || !lastName) {
@@ -53,22 +53,55 @@ export async function POST(req: Request) {
     // 4. Initialize Stripe with real key
     const stripe = new Stripe(secretKey);
 
-    // 5. Create a donation record in "pending" status
-    const donationId = `VB-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    // 5. Create or retrieve/update a donation record in "pending" status
+    let donation;
+    if (retryDonationId) {
+      donation = await Donation.findById(retryDonationId);
+      if (!donation) {
+        return NextResponse.json(
+          { error: "Donation record to retry not found." },
+          { status: 404 }
+        );
+      }
+      // Update details for the retry attempt
+      donation.amount = amount;
+      donation.paymentStatus = "pending";
+      donation.failureReason = null;
+      await donation.save();
+    } else {
+      const donationId = `VB-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
-    const donation = await Donation.create({
-      donationId,
-      userId: userId || null,
-      email,
-      firstName,
-      lastName,
-      amount,
-      isGuest: !!isGuest,
-      paymentStatus: "pending",
-    });
+      donation = await Donation.create({
+        donationId,
+        userId: userId || null,
+        email,
+        firstName,
+        lastName,
+        amount,
+        isGuest: !!isGuest,
+        paymentStatus: "pending",
+      });
+    }
 
     // 6. Create Stripe Checkout Session
     const origin = req.headers.get("origin") || process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+    const appendParam = (url: string, key: string, value: string) => {
+      const separator = url.includes("?") ? "&" : "?";
+      return `${url}${separator}${key}=${value}`;
+    };
+
+    const finalSuccessUrl = appendParam(
+      successUrl || `${origin}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      "donationId",
+      donation._id.toString()
+    );
+
+    const finalCancelUrl = appendParam(
+      cancelUrl || `${origin}/donate?canceled=true`,
+      "donationId",
+      donation._id.toString()
+    );
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -86,19 +119,22 @@ export async function POST(req: Request) {
         },
       ],
       mode: "payment",
-      success_url: successUrl || `${origin}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${origin}/donate?canceled=true`,
+      success_url: finalSuccessUrl,
+      cancel_url: finalCancelUrl,
       customer_email: email,
       metadata: {
         donationId: donation._id.toString(),
-        customDonationId: donationId,
+        customDonationId: donation.donationId,
         userId: userId || "",
         isGuest: isGuest ? "true" : "false",
       },
     });
 
-    // 7. Update donation record with session ID
+    // 7. Update donation record with session ID and payment intent ID
     donation.stripeSessionId = session.id;
+    if (session.payment_intent && typeof session.payment_intent === "string") {
+      donation.stripePaymentIntentId = session.payment_intent;
+    }
     await donation.save();
 
     return NextResponse.json({ url: session.url });

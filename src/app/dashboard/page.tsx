@@ -24,6 +24,7 @@ export default function UserDashboard() {
   const [donations, setDonations] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [successOverrideIds, setSuccessOverrideIds] = useState<string[]>([]);
 
   // Donation Selector States
   const [donationStep, setDonationStep] = useState<"idle" | "amount" | "processing">("idle");
@@ -43,6 +44,15 @@ export default function UserDashboard() {
       if (donationsRes.ok) {
         const donationsData = await donationsRes.json();
         setDonations(donationsData);
+
+        // Clean up success override IDs if they have transitioned to 'success' in the database
+        setSuccessOverrideIds(prev => {
+          if (prev.length === 0) return prev;
+          return prev.filter(id => {
+            const found = donationsData.find((d: any) => d._id === id);
+            return found && found.paymentStatus === "pending";
+          });
+        });
       }
       
       if (profileRes.ok) {
@@ -66,8 +76,13 @@ export default function UserDashboard() {
   // Handle URL redirect query parameters from Stripe checkout
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const donationId = params.get("donationId");
+
     if (params.get("success") === "true") {
       setShowSuccessModal(true);
+      if (donationId) {
+        setSuccessOverrideIds(prev => [...prev, donationId]);
+      }
       window.history.replaceState({}, "", "/dashboard");
       
       // Initial refresh for donation table
@@ -82,6 +97,19 @@ export default function UserDashboard() {
     } else if (params.get("canceled") === "true") {
       setShowCancelBanner(true);
       window.history.replaceState({}, "", "/dashboard");
+
+      if (donationId) {
+        // Immediately notify backend about the cancellation
+        fetch("/api/user/donations/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ donationId })
+        }).then(() => {
+          fetchDashboardData();
+        }).catch(err => {
+          console.error("Failed to cancel donation:", err);
+        });
+      }
     }
   }, []);
 
@@ -128,9 +156,58 @@ export default function UserDashboard() {
     }
   };
 
-  const totalDonated = donations.length > 0 ? donations.reduce((sum, d) => sum + d.amount, 0) : 0;
+  const handleRetryPayment = async (failedDonation: any) => {
+    setDonationStep("processing");
+    setPaymentError(null);
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: failedDonation.amount,
+          firstName: failedDonation.firstName || user?.firstName || "Donor",
+          lastName: failedDonation.lastName || user?.lastName || "Account",
+          email: failedDonation.email || user?.email,
+          userId: failedDonation.userId || user?._id || user?.userId,
+          isGuest: false,
+          retryDonationId: failedDonation._id,
+          successUrl: `${window.location.origin}/dashboard?success=true`,
+          cancelUrl: `${window.location.origin}/dashboard?canceled=true`
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to recreate payment session.");
+      }
+
+      if (!data.url) {
+        throw new Error("No checkout URL returned from payment server.");
+      }
+
+      // Redirect to Stripe checkout
+      window.location.href = data.url;
+    } catch (err: any) {
+      // If error occurs, reset step so quick action card behaves correctly
+      setDonationStep("idle");
+      // Display error banner/alert
+      alert(err.message || "Something went wrong during payment retry. Please try again.");
+    }
+  };
+
+  // Map donations to apply overrides if needed
+  const mappedDonations = donations.map((d: any) => {
+    if (successOverrideIds.includes(d._id)) {
+      return { ...d, paymentStatus: "success" };
+    }
+    return d;
+  });
+
+  const successfulDonations = mappedDonations.filter((d: any) => d.paymentStatus === "success");
+  const totalDonated = successfulDonations.length > 0 ? successfulDonations.reduce((sum, d) => sum + d.amount, 0) : 0;
   const livesImpacted = Math.floor(totalDonated / 100);
-  const recentDonations = donations.slice(0, 5);
+  const recentDonations = mappedDonations.slice(0, 5);
 
   if (isLoading) {
     return (
@@ -192,7 +269,7 @@ export default function UserDashboard() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-[#D4AF37]">
                 <Heart className="w-4 h-4 fill-current" />
-                <span className="text-2xl font-black font-serif">{donations.length}</span>
+                <span className="text-2xl font-black font-serif">{successfulDonations.length}</span>
               </div>
               <span className="text-[10px] text-white/30 uppercase font-black tracking-widest">Successful Donations</span>
             </div>
@@ -386,17 +463,41 @@ export default function UserDashboard() {
                        <span className="text-lg font-black text-[#0A1128]">${donation.amount.toLocaleString()}</span>
                     </td>
                     <td className="px-10 py-8">
-                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg border border-emerald-100 uppercase tracking-widest">
-                         <ShieldCheck className="w-3.5 h-3.5" /> Success
-                       </span>
+                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-lg border border-rose-100 uppercase tracking-widest">
+                            <AlertCircle className="w-3.5 h-3.5" /> Failed
+                          </span>
+                          <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
+                            {donation.failureReason || "Payment not completed."}
+                          </p>
+                        </div>
+                      ) : donation.paymentStatus === "refunded" ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-700 text-[10px] font-black rounded-lg border border-orange-100 uppercase tracking-widest">
+                          <AlertCircle className="w-3.5 h-3.5" /> Refunded
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg border border-emerald-100 uppercase tracking-widest">
+                          <ShieldCheck className="w-3.5 h-3.5" /> Payment Successful
+                        </span>
+                      )}
                     </td>
                     <td className="px-10 py-8 text-right">
-                       <Link 
-                        href={`/receipt/${donation._id}`} 
-                        className="inline-flex items-center justify-center w-12 h-12 bg-white border border-gray-100 text-gray-400 rounded-2xl hover:bg-[#0A1128] hover:text-[#D4AF37] hover:border-[#0A1128] transition-all shadow-sm"
-                       >
-                          <Download className="w-5 h-5" />
-                       </Link>
+                      {donation.paymentStatus === "failed" || donation.paymentStatus === "pending" ? (
+                        <button 
+                          onClick={() => handleRetryPayment(donation)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#D4AF37] text-[#0A1128] font-black text-[10px] rounded-xl hover:bg-[#c2a032] hover:scale-105 transition-all shadow-sm uppercase tracking-wider"
+                        >
+                           Pay Now <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <Link 
+                         href={`/receipt/${donation._id}`} 
+                         className="inline-flex items-center justify-center w-12 h-12 bg-white border border-gray-100 text-gray-400 rounded-2xl hover:bg-[#0A1128] hover:text-[#D4AF37] hover:border-[#0A1128] transition-all shadow-sm"
+                        >
+                           <Download className="w-5 h-5" />
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 ))

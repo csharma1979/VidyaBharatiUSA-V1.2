@@ -461,12 +461,24 @@ export default function AdminDonationsPage() {
                 >
                   <Trash2 className="w-4 h-4" /> Delete Payment
                 </button>
-                <button
-                  onClick={() => setSelectedDonation(null)}
-                  className="px-6 py-2.5 bg-[#0A1128] text-white rounded-xl text-sm font-bold hover:bg-[#1a2b5e] transition-all shadow-sm"
-                >
-                  Close details
-                </button>
+                <div className="flex gap-2">
+                  {(selectedDonation.paymentStatus === "success" || selectedDonation.paymentStatus === "refunded") && (
+                    <a 
+                      href={`/receipt/${selectedDonation._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 border border-amber-200 text-[#D4AF37] rounded-xl text-sm font-bold hover:bg-amber-50 transition-all flex items-center gap-1.5"
+                    >
+                      View Receipt <ArrowUpRight className="w-4 h-4" />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setSelectedDonation(null)}
+                    className="px-6 py-2.5 bg-[#0A1128] text-white rounded-xl text-sm font-bold hover:bg-[#1a2b5e] transition-all shadow-sm"
+                  >
+                    Close details
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>
