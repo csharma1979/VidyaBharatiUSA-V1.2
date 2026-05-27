@@ -23,9 +23,15 @@ export async function POST(req: Request) {
     const resetToken = await signResetToken({ email: user.email });
     
     // Get host origin dynamically from headers (handles reverse proxy like Nginx in production)
-    const forwardedHost = req.headers.get("x-forwarded-host");
-    const forwardedProto = req.headers.get("x-forwarded-proto");
-    const host = forwardedHost || req.headers.get("host") || new URL(req.url).host;
+    const getFirstHeaderValue = (val: string | null): string | null => {
+      if (!val) return null;
+      return val.split(",")[0].trim();
+    };
+
+    const forwardedHost = getFirstHeaderValue(req.headers.get("x-forwarded-host"));
+    const forwardedProto = getFirstHeaderValue(req.headers.get("x-forwarded-proto"));
+    const rawHost = forwardedHost || getFirstHeaderValue(req.headers.get("host")) || new URL(req.url).host;
+    const host = rawHost.split(",")[0].trim();
     const proto = forwardedProto || (host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https");
     const origin = `${proto}://${host}`;
     const resetUrl = `${origin}/reset-password?token=${resetToken}`;
