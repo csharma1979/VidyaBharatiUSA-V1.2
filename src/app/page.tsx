@@ -5,6 +5,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
+import { NewsCarousel } from "@/components/ui/NewsCarousel";
 import { Button } from "@/components/ui/Button";
 import { HeroSlider } from "@/components/ui/HeroSlider";
 import { Counter } from "@/components/ui/Counter";
@@ -129,59 +130,17 @@ export default function Home() {
       {/* Latest News Section */}
       <section className="section-padding overflow-hidden">
         <div className="container px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div className="mb-16">
             <div className="space-y-4">
               <h2 className="text-sm font-black uppercase tracking-widest text-saffron">Stay Updated</h2>
               <h3 className="text-4xl md:text-5xl font-serif font-black text-deep-blue">
                 Latest News
               </h3>
             </div>
-            <Button variant="outline" className="border-deep-blue text-deep-blue hover:bg-deep-blue hover:text-white rounded-full">
-              View All Updates
-            </Button>
           </div>
 
-          <div className="grid grid-cols-1 gap-12">
-            {/* Featured News Card */}
-            <div className="group relative bg-white border border-slate-100 rounded-[3rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500">
-              <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="relative h-[300px] lg:h-auto overflow-hidden">
-                  <Image 
-                    src="/images/exam-success.webp" 
-                    alt="Vidya Bharati students excel in Board Exams" 
-                    fill 
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute top-8 left-8">
-                    <div className="bg-saffron text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
-                      Academic Excellence
-                    </div>
-                  </div>
-                </div>
-                <div className="p-10 md:p-16 space-y-8 flex flex-col justify-center">
-                  <div className="flex items-center gap-4 text-slate-400 text-sm font-bold">
-                    <Calendar className="w-4 h-4 text-saffron" />
-                    <span>15 May 2025</span>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h4 className="text-3xl md:text-4xl font-black text-deep-blue leading-tight group-hover:text-saffron transition-colors">
-                      Vidya Bharati students excel in Board Exams
-                    </h4>
-                    <p className="text-lg text-slate-600 leading-relaxed">
-                      Vidya Bharati students have excelled in the Board Examinations, securing top ranks in the state. 
-                      Among the top 10, our students have achieved the 1st, 3rd, and 10th positions. 
-                      The 1st rank holder scored a perfect 500/500, while the 3rd rank holder secured 498/500.
-                    </p>
-                  </div>
-
-                  <Button variant="link" className="p-0 h-auto text-saffron font-black tracking-widest group/link">
-                    READ FULL STORY 
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/link:translate-x-2 transition-transform" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+          <div className="w-full">
+            <NewsCarousel />
           </div>
         </div>
       </section>
