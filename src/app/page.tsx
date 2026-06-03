@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { NewsCarousel } from "@/components/ui/NewsCarousel";
+import { AnnouncementPopup } from "@/components/ui/AnnouncementPopup";
 import { Button } from "@/components/ui/Button";
 import { HeroSlider } from "@/components/ui/HeroSlider";
 import { Counter } from "@/components/ui/Counter";
@@ -15,6 +16,7 @@ import { Heart, BookOpen, Users, Globe, ArrowRight, Quote, Calendar, Newspaper }
 export default function Home() {
   return (
     <main className="relative min-h-screen">
+      <AnnouncementPopup />
       <Navbar />
 
       <HeroSlider />
