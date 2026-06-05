@@ -181,7 +181,7 @@ export function HeroSlider() {
                       size="lg" 
                       className="text-[#D4AF37] border-[#D4AF37]/40 hover:bg-[#D4AF37]/10 text-lg w-full"
                     >
-                      LA-Gala Event
+                      LA- Gala
                     </Button>
                   </Link>
                 </div>

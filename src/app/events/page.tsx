@@ -144,7 +144,27 @@ export default function EventsPage() {
           { label: "Home", href: "/" },
           { label: "Events" }
         ]}
-      />
+      >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="text-white border-white/30 hover:bg-white/10 text-lg w-full sm:w-auto h-14 px-8 rounded-xl font-bold"
+            onClick={() => window.dispatchEvent(new CustomEvent("showUSAProgramDetails"))}
+          >
+            View USA Tour Schedule
+          </Button>
+          <Link href="/LA-Gala" className="w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-[#D4AF37] border-[#D4AF37]/40 hover:bg-[#D4AF37]/10 text-lg w-full h-14 px-8 rounded-xl font-bold"
+            >
+              LA- Gala
+            </Button>
+          </Link>
+        </div>
+      </PageHero>
 
       <section className="py-24">
         <div className="container px-6 mx-auto max-w-7xl">
