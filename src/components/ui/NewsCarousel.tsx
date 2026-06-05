@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, Calendar, ArrowRight, X, Clock, MapPin } from "lucide-react";
 import { Button } from "./Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,7 @@ interface NewsItem {
     time?: string;
     location?: string;
   };
+  link?: string;
 }
 
 const newsItems: NewsItem[] = [
@@ -32,6 +34,7 @@ const newsItems: NewsItem[] = [
       time: "5:30 PM",
       location: "Marriott Burlington"
     },
+    link: "/LA-Gala",
     fullText: (
       <div className="space-y-4 text-slate-600 leading-relaxed">
         <p>
@@ -106,20 +109,37 @@ export function NewsCarousel() {
             className="grid grid-cols-1 lg:grid-cols-2"
           >
             {/* Image Section */}
-            <div className="relative h-[300px] lg:h-[480px] overflow-hidden bg-slate-100">
-              <Image
-                src={activeNews.image}
-                alt={activeNews.title}
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute top-8 left-8">
-                <span className="bg-saffron text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
-                  {activeNews.category}
-                </span>
+            {activeNews.link ? (
+              <Link href={activeNews.link} className="relative h-[300px] lg:h-[480px] overflow-hidden bg-slate-100 block group/img">
+                <Image
+                  src={activeNews.image}
+                  alt={activeNews.title}
+                  fill
+                  className="object-cover group-hover/img:scale-105 transition-transform duration-500"
+                  priority
+                />
+                <div className="absolute top-8 left-8">
+                  <span className="bg-saffron text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
+                    {activeNews.category}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <div className="relative h-[300px] lg:h-[480px] overflow-hidden bg-slate-100">
+                <Image
+                  src={activeNews.image}
+                  alt={activeNews.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute top-8 left-8">
+                  <span className="bg-saffron text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
+                    {activeNews.category}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Text Section */}
             <div className="p-8 md:p-14 flex flex-col justify-between">
@@ -136,12 +156,20 @@ export function NewsCarousel() {
                   )}
                 </div>
 
-                <h4 
-                  className="text-2xl md:text-3xl font-serif font-black text-deep-blue leading-tight hover:text-saffron transition-colors cursor-pointer" 
-                  onClick={() => setSelectedNews(activeNews)}
-                >
-                  {activeNews.title}
-                </h4>
+                {activeNews.link ? (
+                  <Link href={activeNews.link}>
+                    <h4 className="text-2xl md:text-3xl font-serif font-black text-deep-blue leading-tight hover:text-saffron transition-colors cursor-pointer">
+                      {activeNews.title}
+                    </h4>
+                  </Link>
+                ) : (
+                  <h4 
+                    className="text-2xl md:text-3xl font-serif font-black text-deep-blue leading-tight hover:text-saffron transition-colors cursor-pointer" 
+                    onClick={() => setSelectedNews(activeNews)}
+                  >
+                    {activeNews.title}
+                  </h4>
+                )}
 
                 <p className="text-slate-600 leading-relaxed text-sm md:text-base line-clamp-4">
                   {activeNews.summary}
@@ -149,14 +177,26 @@ export function NewsCarousel() {
               </div>
 
               <div className="mt-8 flex items-center justify-between">
-                <Button
-                  onClick={() => setSelectedNews(activeNews)}
-                  variant="link"
-                  className="p-0 h-auto text-saffron font-black tracking-widest group/link"
-                >
-                  READ FULL STORY
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover/link:translate-x-2 transition-transform" />
-                </Button>
+                {activeNews.link ? (
+                  <Link href={activeNews.link}>
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-saffron font-black tracking-widest group/link"
+                    >
+                      READ FULL STORY
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover/link:translate-x-2 transition-transform" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    onClick={() => setSelectedNews(activeNews)}
+                    variant="link"
+                    className="p-0 h-auto text-saffron font-black tracking-widest group/link"
+                  >
+                    READ FULL STORY
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/link:translate-x-2 transition-transform" />
+                  </Button>
+                )}
 
                 {/* Left/Right Navigation Controls */}
                 <div className="flex items-center gap-2">
