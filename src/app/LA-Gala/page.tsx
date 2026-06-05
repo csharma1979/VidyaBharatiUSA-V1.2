@@ -4,164 +4,272 @@ import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import GalaTicketForm from "@/components/donation/GalaTicketForm";
-import { Calendar, MapPin, CheckCircle, AlertTriangle, ShieldCheck, Sparkles, Loader2, Quote, BookOpen } from "lucide-react";
+import DonationForm from "@/components/donation/DonationForm";
+import {
+  CheckCircle,
+  AlertTriangle,
+  Loader2,
+  Calendar,
+  MapPin,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 
+/* ─── Lotus ornament icon ─────────────────────────────────────────────────── */
+function LotusIcon({ className = "w-6 h-6 text-[#D4AF37]" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="M12 21c-1.2-3.5-1.8-6.5-1.8-8.5 0-3 1.8-5.5 1.8-5.5s1.8 2.5 1.8 5.5c0 2-.6 5-1.8 8.5z" fill="currentColor" fillOpacity="0.15" />
+      <path d="M12 21c-4.5-1-6.5-2.5-7-4.5-.4-1.8.4-3.2.4-3.2s2 0 3.2 2c1 1.6 1.8 3.2 3.4 5.7z" />
+      <path d="M12 16.5c-3-2-4-4.5-4-4.5" />
+      <path d="M12 21c4.5-1 6.5-2.5 7-4.5.4-1.8-.4-3.2-.4-3.2s-2 0-3.2 2c-1 1.6-1.8 3.2-3.4 5.7z" />
+      <path d="M12 16.5c3-2 4-4.5 4-4.5" />
+      <path d="M7 21h10M9 22.5h6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/* ─── Gold divider ─────────────────────────────────────────────────────────── */
+function GoldDivider() {
+  return (
+    <div className="flex items-center gap-4 my-10">
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-[#D4AF37]/20" />
+      <LotusIcon className="w-5 h-5 text-[#D4AF37] shrink-0" />
+      <div className="flex-1 h-px bg-gradient-to-l from-transparent via-[#D4AF37]/50 to-[#D4AF37]/20" />
+    </div>
+  );
+}
+
+/* ─── Main page content ────────────────────────────────────────────────────── */
 function GalaPageContent() {
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
 
   return (
-    <main className="flex-grow pt-32 pb-20">
-      <div className="container mx-auto px-6 max-w-7xl">
-        {success === "true" && (
-          <div className="mb-12 p-8 bg-emerald-50 border border-emerald-100 rounded-3xl flex flex-col md:flex-row items-center gap-6 text-emerald-900 shadow-sm max-w-4xl mx-auto">
-            <div className="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-              <CheckCircle className="w-8 h-8" />
-            </div>
-            <div className="text-center md:text-left space-y-1">
-              <h2 className="text-2xl font-bold font-serif text-[#0A1128]">Gala Registration Successful!</h2>
-              <p className="text-slate-600">
-                Thank you! Your ticket purchase was successful. We have sent a confirmation email to your inbox. We look forward to welcoming you at the Burlington Marriott on Sunday, July 12, 2026.
-              </p>
-            </div>
-          </div>
-        )}
+    <main className="flex-grow bg-[#06091a] bg-[radial-gradient(ellipse_at_top,#1a2252_0%,#06091a_60%)] pt-28 pb-20 px-4 md:px-8">
 
-        {canceled === "true" && (
-          <div className="mb-12 p-8 bg-amber-50 border border-amber-100 rounded-3xl flex flex-col md:flex-row items-center gap-6 text-amber-900 shadow-sm max-w-4xl mx-auto">
-            <div className="w-16 h-16 bg-amber-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
-              <AlertTriangle className="w-8 h-8" />
-            </div>
-            <div className="text-center md:text-left space-y-1">
-              <h2 className="text-2xl font-bold font-serif text-[#0A1128]">Checkout Canceled</h2>
-              <p className="text-slate-600">
-                The payment process was canceled. If you still wish to join us, you can choose a ticket tier and try again below.
-              </p>
-            </div>
-          </div>
-        )}
+      {/* ── Outer page label ── */}
+      <div className="text-center mb-8">
+        <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37]/70">
+          <Sparkles className="w-3 h-3" /> Vidya Bharati Foundation of America <Sparkles className="w-3 h-3" />
+        </span>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Left Column: Event details & Article Content */}
-          <div className="space-y-10">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-[#D4AF37] rounded-full text-sm font-bold uppercase tracking-wider">
-                <Sparkles className="w-4 h-4" /> Grand Annual Event
-              </div>
+      {/* ════════════════════════════════════════════
+          SINGLE LARGE FLYER CARD
+      ════════════════════════════════════════════ */}
+      <div className="max-w-6xl mx-auto rounded-[2.5rem] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.7)] border border-[#D4AF37]/20">
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#0A1128] leading-tight font-black uppercase tracking-tight">
-                Vidya Bharati Foundation USA Gala in Burlington to Spotlight <span className="text-[#D4AF37]">India’s Education Future</span>
-              </h1>
-              
-              <p className="text-base text-gray-500 font-medium leading-relaxed">
-                Educators, technologists, entrepreneurs, and philanthropists to gather July 12 for discussions on human capital, AI, and school transformation in India
-              </p>
-            </div>
+        {/* ── CARD HEADER — deep navy with radial gold glow ── */}
+        <div className="relative bg-[#0A1128] px-8 md:px-16 pt-14 pb-12 text-center overflow-hidden">
+          {/* Background glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,175,55,0.12)_0%,transparent_65%)] pointer-events-none" />
+          {/* Corner ornaments */}
+          <div className="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 border-[#D4AF37]/30 rounded-tl-2xl" />
+          <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-[#D4AF37]/30 rounded-tr-2xl" />
 
-            {/* Event Meta Badges */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex gap-4 items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                <Calendar className="w-6 h-6 text-[#D4AF37] shrink-0" />
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-wider text-gray-400">Date & Time</h4>
-                  <p className="font-bold text-[#0A1128] text-sm">Sunday, July 12, 2026</p>
-                  <p className="text-xs text-gray-400 font-medium">Starts at 5:30 p.m.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                <MapPin className="w-6 h-6 text-[#D4AF37] shrink-0" />
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-wider text-gray-400">Location</h4>
-                  <p className="font-bold text-[#0A1128] text-sm">Burlington Marriott</p>
-                  <p className="text-xs text-gray-400 font-medium">Burlington, MA</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Flyer Image Container */}
-            <div className="relative w-full max-w-lg mx-auto md:mx-0 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-100 bg-white group">
+          {/* Logo */}
+          <div className="relative z-10 flex justify-center mb-5">
+            <div className="w-20 h-20 rounded-full bg-white/5 border border-[#D4AF37]/30 flex items-center justify-center shadow-lg shadow-[#D4AF37]/10 p-1">
               <img
-                src="/images/LosAngeles-Gala-event.jpeg"
-                alt="Burlington Gala Event Flyer"
-                className="w-full h-auto object-contain block group-hover:scale-[1.01] transition-transform duration-700"
+                src="/Vidya-Bharati-logo.webp"
+                alt="Vidya Bharati Foundation Logo"
+                className="w-full h-full object-contain"
               />
             </div>
-
-            {/* Structured Article / Press Release Content */}
-            <div className="prose prose-slate max-w-none space-y-6 text-slate-600 leading-relaxed text-sm">
-              <p className="font-semibold text-slate-800">
-                <span className="text-[#0A1128] uppercase font-bold text-xs tracking-wider">Burlington, Mass. —</span> The second annual Vidya Bharati Foundation USA Gala will take place on July 12 at the Burlington Marriott in Burlington, MA, bringing together educators, entrepreneurs, technologists, and members of the Indian-American community for an evening centered on the future of education in India.
-              </p>
-
-              <p>
-                Organizers describe the event as more than a traditional fundraising gala, positioning it instead as a broader conversation about India’s long-term educational transformation and the role institutions will play in shaping the country’s future workforce and human capital.
-              </p>
-
-              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider text-[#0A1128] flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#D4AF37]" /> Addressing Deeper Challenges
-                </h3>
-                <p className="text-xs">
-                  The gathering comes at a time when India is facing increasing debate over educational quality, employable skills, teacher effectiveness, and the ability of schools to prepare students for a rapidly changing global economy. While school enrollment and infrastructure have expanded significantly across the country in recent decades, supporters of the initiative argue that deeper challenges remain around learning outcomes, critical thinking, and long-term capability building.
-                </p>
-              </div>
-
-              <p>
-                At the center of the conversation is Vidya Bharati, one of India’s largest educational networks, which operates thousands of schools across rural and underserved communities. Supporters say the organization has focused on combining academic instruction with values, aspiration, and community-rooted education while continuing to expand access in areas often overlooked by larger policy conversations.
-              </p>
-
-              <div className="border-l-4 border-[#D4AF37] pl-5 italic text-slate-700 font-serif my-6">
-                <Quote className="w-8 h-8 text-[#D4AF37]/25 mb-1 -ml-2" />
-                "The gala will also highlight themes explored in 'The Full Plate: India’s Education Revolution and the Race for Human Capital,' a new work by Boston-based author, technologist, and former journalist Satish Jha. The work argues that India’s education challenges cannot be solved through isolated reforms alone, but instead require an integrated ecosystem that includes nutrition, teacher training, technology, localized learning, accountability, and aspiration."
-              </div>
-
-              <p>
-                Organizers say the July 12 event is intended to encourage members of the Indian diaspora to think beyond traditional charitable giving and consider long-term institutional investment in education and human development.
-              </p>
-
-              <p>
-                The evening is expected to draw leaders from business, technology, education, and philanthropy who increasingly view education not only as social support, but also as nation-building and economic development.
-              </p>
-
-              <p className="font-bold text-[#0A1128] border-t border-slate-100 pt-4 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#D4AF37]" /> Organizers say the evening’s central message is simple but urgent: India’s future will ultimately be shaped classroom by classroom, teacher by teacher, and child by child.
-              </p>
-            </div>
-
-            <div className="flex gap-4 items-center bg-gray-50/70 p-5 rounded-2xl border border-gray-100/50 text-xs text-gray-500">
-              <ShieldCheck className="w-5 h-5 text-[#0A1128] shrink-0" />
-              <span>
-                VidyaBharati USA is a registered 501(c)(3) tax-exempt organization. Your ticket is tax-deductible to the extent allowed by law. Official EIN: <strong>47-4676188</strong>
-              </span>
-            </div>
           </div>
 
-          {/* Right Column: Ticket Form */}
-          <div className="relative lg:pt-8 lg:sticky lg:top-28">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
-            
-            <div className="relative z-10">
-              <GalaTicketForm />
+          {/* Org name */}
+          <div className="relative z-10 space-y-0.5 mb-4">
+            <p className="text-xs font-black tracking-[0.3em] text-white/80 uppercase">Vidya Bharati</p>
+            <p className="text-[10px] font-semibold tracking-[0.4em] text-[#D4AF37] uppercase">Foundation of America</p>
+          </div>
+
+          {/* Ornament */}
+          <div className="relative z-10 flex items-center justify-center gap-3 mb-6">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-[#D4AF37]/60" />
+            <LotusIcon className="w-5 h-5 text-[#D4AF37]" />
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-[#D4AF37]/60" />
+          </div>
+
+          {/* Main title */}
+          <h1 className="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black text-[#D4AF37] uppercase tracking-wide leading-tight">
+            Los Angeles Gala
+          </h1>
+          <p className="relative z-10 text-lg md:text-xl font-serif text-white/70 mt-1 tracking-widest uppercase">
+            &amp; Education Support
+          </p>
+
+          {/* Subtitle */}
+          <p className="relative z-10 mt-5 text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Join us for an elegant evening dedicated to sharing our educational mission, celebrating student achievements, and building a stronger sponsor community.
+          </p>
+
+          {/* Event meta pills */}
+          <div className="relative z-10 mt-8 flex flex-wrap justify-center gap-3">
+            {[
+              { icon: Calendar, label: "Sunday, July 26, 2026" },
+              { icon: Clock, label: "Starts at 5:30 p.m." },
+              { icon: MapPin, label: "Sheraton Cerritos Hotel, Cerritos, CA" },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-2 px-5 py-2.5 bg-white/5 backdrop-blur-sm border border-[#D4AF37]/20 rounded-full text-xs text-white/90 font-medium">
+                <Icon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                {label}
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom border fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent" />
+        </div>
+
+        {/* ── CARD BODY — warm white ── */}
+        <div className="bg-gradient-to-b from-[#fdfcf7] to-[#f8f6ef] px-6 md:px-12 lg:px-16 py-14">
+
+          {/* ── Success / Canceled Notifications ── */}
+          {success === "true" && (
+            <div className="mb-10 p-6 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col md:flex-row items-center gap-5 shadow-sm">
+              <div className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-md">
+                <CheckCircle className="w-7 h-7" />
+              </div>
+              <div className="text-center md:text-left">
+                <h2 className="text-xl font-bold font-serif text-[#0A1128]">Gala Registration Successful!</h2>
+                <p className="text-slate-500 text-sm mt-1">
+                  Thank you! Your ticket purchase was successful. We look forward to welcoming you at the Sheraton Cerritos Hotel on Sunday, July 26, 2026.
+                </p>
+              </div>
             </div>
+          )}
+
+          {canceled === "true" && (
+            <div className="mb-10 p-6 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col md:flex-row items-center gap-5 shadow-sm">
+              <div className="w-14 h-14 bg-amber-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-md">
+                <AlertTriangle className="w-7 h-7" />
+              </div>
+              <div className="text-center md:text-left">
+                <h2 className="text-xl font-bold font-serif text-[#0A1128]">Checkout Canceled</h2>
+                <p className="text-slate-500 text-sm mt-1">
+                  The payment process was canceled. If you still wish to join us, choose a ticket tier and try again below.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ── Section label ── */}
+          <div className="text-center mb-10">
+            <span className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37] border border-[#D4AF37]/30 rounded-full px-5 py-1.5 bg-[#D4AF37]/5">
+              Reserve Your Place
+            </span>
+          </div>
+
+          {/* ── Forms — equal width & height side by side ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+
+            {/* ── Join Our Cause (left) ── */}
+            <div className="flex flex-col">
+              {/* Shared label above card */}
+              <div className="mb-5 text-center">
+                <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#D4AF37] mb-1">Support Our Mission</span>
+                <h2 className="text-2xl font-serif font-black text-[#0A1128] uppercase tracking-tight">Join Our Cause</h2>
+                <p className="text-sm text-gray-500 mt-1">Choose your preferred way to support our mission.</p>
+              </div>
+              {/* Card shell */}
+              <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <DonationForm isGalaMode={true} />
+              </div>
+            </div>
+
+            {/* ── Purchase Gala Ticket (right) ── */}
+            <div className="flex flex-col">
+              {/* Shared label above card */}
+              <div className="mb-5 text-center">
+                <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#D4AF37] mb-1">Gala 2026</span>
+                <h2 className="text-2xl font-serif font-black text-[#0A1128] uppercase tracking-tight">Purchase Gala Ticket</h2>
+                <p className="text-sm text-gray-500 mt-1">Choose your ticket package for the Gala Dinner.</p>
+              </div>
+              {/* Card shell */}
+              <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <GalaTicketForm />
+              </div>
+            </div>
+
+          </div>
+
+          <GoldDivider />
+
+          {/* ── Event Detail Cards ── */}
+          <div className="text-center mb-8">
+            <span className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-[#D4AF37] border border-[#D4AF37]/30 rounded-full px-5 py-1.5 bg-[#D4AF37]/5">
+              Event Information
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              { icon: Calendar, label: "Date", value: "Sunday, July 26, 2026" },
+              { icon: Clock, label: "Time", value: "Starts at 5:30 p.m." },
+              { icon: MapPin, label: "Venue", value: "Sheraton Cerritos Hotel, Cerritos, CA" },
+            ].map(({ icon: Icon, label, value }) => (
+              <div
+                key={label}
+                className="group bg-[#0A1128] rounded-2xl overflow-hidden border border-[#D4AF37]/20 shadow-lg hover:shadow-[#D4AF37]/10 hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className="bg-[#D4AF37] px-5 py-2.5 flex items-center gap-2">
+                  <Icon className="w-4 h-4 text-[#0A1128]" />
+                  <span className="text-[#0A1128] font-black text-[10px] uppercase tracking-widest">{label}</span>
+                </div>
+                <div className="px-5 py-7 flex flex-col items-center text-center">
+                  <div className="w-11 h-11 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/25 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-[#D4AF37]" />
+                  </div>
+                  <p className="text-white font-semibold text-base leading-snug">{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <GoldDivider />
+
+          {/* ── Thank You message ── */}
+          <div className="text-center py-4">
+            <LotusIcon className="w-8 h-8 text-[#D4AF37] mx-auto mb-3" />
+            <p className="text-[#0A1128] font-serif text-lg md:text-xl font-semibold leading-relaxed max-w-xl mx-auto">
+              Thank you for supporting education, culture, and value based learning.
+            </p>
+            <p className="text-slate-400 text-xs font-medium tracking-widest uppercase mt-3">
+              Vidya Bharati Foundation of America
+            </p>
+          </div>
+
+        </div>
+
+        {/* ── CARD FOOTER strip ── */}
+        <div className="bg-[#0A1128] px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#D4AF37]/20">
+          <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">© 2026 Vidya Bharati Foundation of America</p>
+          <div className="flex items-center gap-2 text-[#D4AF37]/60">
+            <LotusIcon className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em]">Empowering Generations Through Education</span>
           </div>
         </div>
       </div>
+
     </main>
   );
 }
 
+/* ─── Page shell ───────────────────────────────────────────────────────────── */
 export default function LAGalaPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#06091a]">
       <Navbar />
-      <Suspense fallback={
-        <div className="flex-grow flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-10 h-10 animate-spin text-[#D4AF37]" />
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex-grow flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-10 h-10 animate-spin text-[#D4AF37]" />
+          </div>
+        }
+      >
         <GalaPageContent />
       </Suspense>
       <Footer />

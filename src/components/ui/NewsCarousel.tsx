@@ -34,7 +34,6 @@ const newsItems: NewsItem[] = [
       time: "5:30 PM",
       location: "Marriott Burlington"
     },
-    link: "/LA-Gala",
     fullText: (
       <div className="space-y-4 text-slate-600 leading-relaxed">
         <p>

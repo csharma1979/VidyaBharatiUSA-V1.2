@@ -28,12 +28,18 @@ const donationOptions = [
   { value: 500, label: "Sponsor 1 Child" },
 ];
 
-export default function DonationForm() {
+const galaDonationOptions = [
+  { value: 5000, name: "Sponsor 10 Children", description: "Provide academic year tuition, books, and uniforms for 10 children." },
+  { value: 2500, name: "Sponsor 5 Children", description: "Provide comprehensive education support for 5 deserving children." },
+  { value: 500, name: "Sponsor 1 Child", description: "Provide standard education support for 1 child for a full school year." },
+];
+
+export default function DonationForm({ isGalaMode = false }: { isGalaMode?: boolean }) {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
   const amountSectionRef = useRef<HTMLDivElement>(null);
   
-  const [step, setStep] = useState(0); // 0: Selection, 1: Amount, 2: Info/Auth, 3: Offline Info
+  const [step, setStep] = useState(isGalaMode ? 1 : 0); // 0: Selection, 1: Amount, 2: Info/Auth, 3: Offline Info
   const [isGuest, setIsGuest] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(500);
@@ -155,13 +161,17 @@ export default function DonationForm() {
   };
 
   return (
-    <div ref={formRef} className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 max-w-2xl mx-auto scroll-mt-32">
+    <div ref={formRef} className="h-full bg-white rounded-3xl overflow-hidden scroll-mt-32">
       {/* Header Tabs - Only show when past step 0 and not in offline view */}
       {step > 0 && step < 3 && (
         <div className="flex border-b">
           <button
             onClick={() => setStep(1)}
-            className={`flex-1 py-6 text-sm font-bold uppercase tracking-wider transition-all ${
+            className={`flex-1 py-6 uppercase transition-all ${
+              isGalaMode 
+                ? "text-xs font-black tracking-widest" 
+                : "text-sm font-bold tracking-wider"
+            } ${
               step === 1 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
             }`}
           >
@@ -170,7 +180,11 @@ export default function DonationForm() {
           <button
             disabled={!finalAmount}
             onClick={() => setStep(2)}
-            className={`flex-1 py-6 text-sm font-bold uppercase tracking-wider transition-all ${
+            className={`flex-1 py-6 uppercase transition-all ${
+              isGalaMode 
+                ? "text-xs font-black tracking-widest" 
+                : "text-sm font-bold tracking-wider"
+            } ${
               step === 2 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
             }`}
           >
@@ -179,7 +193,7 @@ export default function DonationForm() {
         </div>
       )}
 
-      <div className="p-8 md:p-12">
+      <div className={isGalaMode ? "p-8 md:p-10" : "p-8 md:p-12"}>
         {error && step < 3 && (
           <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600">
             <AlertCircle className="w-5 h-5 shrink-0" />
@@ -188,15 +202,8 @@ export default function DonationForm() {
         )}
 
         {step === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-10"
-          >
-            <div className="text-center">
-              <h2 className="text-3xl font-serif text-[#0A1128] mb-4 uppercase tracking-tighter font-black">Join Our Cause</h2>
-              <p className="text-gray-500">Choose your preferred way to support our mission.</p>
-            </div>
+            <div className="space-y-10"
+            >
 
             <div className="grid gap-4">
               {/* Guest Option */}
@@ -255,17 +262,20 @@ export default function DonationForm() {
             <p className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
               Powered by secure international payment infrastructure
             </p>
-          </motion.div>
+
+            </div>
         ) : step === 1 ? (
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-10"
+            className={isGalaMode ? "space-y-8" : "space-y-10"}
           >
-            <div className="text-center">
-              <h2 className="text-3xl font-serif text-[#0A1128] mb-4">Choose an Amount (USD)</h2>
-              <p className="text-gray-500">Every contribution helps us reach more students in need.</p>
-            </div>
+            {!isGalaMode && (
+              <div className="text-center">
+                <h2 className="text-3xl font-serif text-[#0A1128] mb-4">Choose an Amount (USD)</h2>
+                <p className="text-gray-500">Every contribution helps us reach more students in need.</p>
+              </div>
+            )}
 
             <div className="relative">
               <AnimatePresence>
@@ -279,49 +289,134 @@ export default function DonationForm() {
                 )}
               </AnimatePresence>
               
-              <div ref={amountSectionRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-                {donationOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setSelectedAmount(option.value);
-                      setCustomAmount("");
-                    }}
-                    className={`py-5 px-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
-                      selectedAmount === option.value && !customAmount
-                        ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] shadow-md"
-                        : "border-gray-100 hover:border-[#D4AF37]/30 text-gray-600"
+              {isGalaMode ? (
+                <div ref={amountSectionRef} className="space-y-4 relative z-10">
+                  {galaDonationOptions.map((option) => {
+                    const isSelected = selectedAmount === option.value && !customAmount;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAmount(option.value);
+                          setCustomAmount("");
+                        }}
+                        className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-left cursor-pointer ${
+                          isSelected
+                            ? "border-[#D4AF37] bg-amber-50/40 shadow-md"
+                            : "border-gray-100 hover:border-[#D4AF37]/30 bg-white"
+                        }`}
+                      >
+                        <div className="flex gap-4 items-center">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
+                            isSelected ? "bg-[#D4AF37]/15 text-[#0A1128] border-[#D4AF37]" : "bg-slate-50 text-slate-400 border-gray-100"
+                          }`}>
+                            <Heart className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold text-[#0A1128]">{option.name}</h3>
+                            <p className="text-xs text-gray-500 leading-normal mt-0.5 max-w-[280px]">
+                              {option.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-xs font-black text-gray-400 block uppercase tracking-wider">USD</span>
+                          <span className="text-xl font-bold font-serif text-[#0A1128]">${option.value.toLocaleString()}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {/* Custom Donation Option */}
+                  <div
+                    className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-left cursor-pointer ${
+                      customAmount
+                        ? "border-[#D4AF37] bg-amber-50/40 shadow-md"
+                        : "border-gray-100 hover:border-[#D4AF37]/30 bg-white"
                     }`}
-                  >
-                    <span className="text-xs font-bold uppercase tracking-wider block opacity-70 mb-1">{option.label}</span>
-                    <span className="text-2xl font-bold font-serif">${option.value.toLocaleString()}</span>
-                  </button>
-                ))}
-                <div className="relative flex items-center">
-                  <span className="absolute left-4 text-xl font-bold font-serif text-gray-400">$</span>
-                  <input
-                    type="number"
-                    placeholder="Any Amount"
-                    value={customAmount}
-                    onChange={(e) => {
-                      setCustomAmount(e.target.value);
+                    onClick={() => {
                       setSelectedAmount(null);
                     }}
-                    className={`w-full pt-6 pb-2 pl-9 pr-4 rounded-2xl border-2 text-left transition-all font-bold font-serif text-lg focus:outline-none ${
-                      customAmount 
-                        ? "border-[#D4AF37] bg-amber-50 text-[#0A1128]" 
-                        : "border-gray-100 text-gray-600 focus:border-[#D4AF37]/50"
-                    }`}
-                  />
-                  <span className="absolute left-9 top-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400 pointer-events-none">
-                    Custom Donation
-                  </span>
+                  >
+                    <div className="flex gap-4 items-center flex-grow mr-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
+                        customAmount ? "bg-[#D4AF37]/15 text-[#0A1128] border-[#D4AF37]" : "bg-slate-50 text-slate-400 border-gray-100"
+                      }`}>
+                        <Heart className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-[#0A1128]">Custom Donation</h3>
+                        <p className="text-xs text-gray-500 leading-normal mt-0.5">
+                          Enter any amount to support our mission.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="relative flex items-center w-28 shrink-0">
+                      <span className="absolute left-3 text-sm font-bold text-gray-400 font-serif">$</span>
+                      <input
+                        type="number"
+                        placeholder="Amount"
+                        value={customAmount}
+                        onChange={(e) => {
+                          setCustomAmount(e.target.value);
+                          setSelectedAmount(null);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className={`w-full py-2.5 pl-7 pr-3 text-sm rounded-xl border font-bold font-serif focus:outline-none ${
+                          customAmount 
+                            ? "border-[#D4AF37] bg-white text-[#0A1128]" 
+                            : "border-gray-200 bg-gray-50 text-gray-600 focus:border-[#D4AF37]/50 focus:bg-white"
+                        }`}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div ref={amountSectionRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                  {donationOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedAmount(option.value);
+                        setCustomAmount("");
+                      }}
+                      className={`py-5 px-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
+                        selectedAmount === option.value && !customAmount
+                          ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] shadow-md"
+                          : "border-gray-100 hover:border-[#D4AF37]/30 text-gray-600"
+                      }`}
+                    >
+                      <span className="text-xs font-bold uppercase tracking-wider block opacity-70 mb-1">{option.label}</span>
+                      <span className="text-2xl font-bold font-serif">${option.value.toLocaleString()}</span>
+                    </button>
+                  ))}
+                  <div className="relative flex items-center">
+                    <span className="absolute left-4 text-xl font-bold font-serif text-gray-400">$</span>
+                    <input
+                      type="number"
+                      placeholder="Any Amount"
+                      value={customAmount}
+                      onChange={(e) => {
+                        setCustomAmount(e.target.value);
+                        setSelectedAmount(null);
+                      }}
+                      className={`w-full pt-6 pb-2 pl-9 pr-4 rounded-2xl border-2 text-left transition-all font-bold font-serif text-lg focus:outline-none ${
+                        customAmount 
+                          ? "border-[#D4AF37] bg-amber-50 text-[#0A1128]" 
+                          : "border-gray-100 text-gray-600 focus:border-[#D4AF37]/50"
+                      }`}
+                    />
+                    <span className="absolute left-9 top-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400 pointer-events-none">
+                      Custom Donation
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4">
-              {!isLoggedIn && (
+              {!isLoggedIn && !isGalaMode && (
                 <button
                   onClick={() => setStep(0)}
                   className="flex-shrink-0 w-16 h-16 bg-gray-50 text-gray-400 rounded-2xl hover:text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center font-bold"
@@ -331,10 +426,14 @@ export default function DonationForm() {
               )}
               <button
                 onClick={handleNext}
-                className="w-full bg-[#0A1128] text-white py-5 rounded-2xl font-bold text-lg hover:bg-[#1a2b5e] transition-all flex items-center justify-center gap-3 group"
+                className={`w-full bg-[#0A1128] text-white py-5 rounded-2xl hover:bg-[#1a2b5e] transition-all flex items-center justify-center gap-3 group ${
+                  isGalaMode 
+                    ? "font-black uppercase text-xs tracking-widest" 
+                    : "font-bold text-lg"
+                }`}
               >
                 Continue to Details
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className={isGalaMode ? "w-4 h-4 group-hover:translate-x-1 transition-transform" : "w-5 h-5 group-hover:translate-x-1 transition-transform"} />
               </button>
             </div>
           </motion.div>
@@ -342,10 +441,17 @@ export default function DonationForm() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="space-y-10"
+            className={isGalaMode ? "space-y-8" : "space-y-10"}
           >
+            {isGalaMode && (
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-serif font-black text-[#0A1128] uppercase tracking-tight">Donor Information</h2>
+                <p className="text-sm text-gray-500">Provide your information for receipt and tracking.</p>
+              </div>
+            )}
+
             {/* Show choice switch only if guest and not logged in */}
-            {isGuest && !isLoggedIn && (
+            {!isGalaMode && isGuest && !isLoggedIn && (
               <div className="flex bg-gray-100 p-1.5 rounded-2xl">
                 <div className="flex-1 py-3 rounded-xl text-sm font-bold bg-white text-[#0A1128] shadow-sm flex items-center justify-center gap-2">
                   <UserPlus className="w-4 h-4" /> Guest Mode
@@ -374,50 +480,58 @@ export default function DonationForm() {
             <form onSubmit={handleDonate} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">First Name</label>
+                  <label className={isGalaMode ? "text-[10px] font-black text-gray-400 uppercase tracking-widest" : "text-xs font-bold text-gray-500 uppercase"}>
+                    First Name
+                  </label>
                   <input
                     required
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37]"
+                    className={`w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] ${isGalaMode ? "text-sm" : ""}`}
                     placeholder="John"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Last Name</label>
+                  <label className={isGalaMode ? "text-[10px] font-black text-gray-400 uppercase tracking-widest" : "text-xs font-bold text-gray-500 uppercase"}>
+                    Last Name
+                  </label>
                   <input
                     required
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37]"
+                    className={`w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] ${isGalaMode ? "text-sm" : ""}`}
                     placeholder="Doe"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">Email Address</label>
+                <label className={isGalaMode ? "text-[10px] font-black text-gray-400 uppercase tracking-widest" : "text-xs font-bold text-gray-500 uppercase"}>
+                  Email Address
+                </label>
                 <input
                   required
                   type="email"
                   value={formData.email}
                   readOnly={isLoggedIn}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className={`w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] ${isLoggedIn ? "opacity-70 cursor-not-allowed" : ""}`}
+                  className={`w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] ${isLoggedIn ? "opacity-70 cursor-not-allowed" : ""} ${isGalaMode ? "text-sm" : ""}`}
                   placeholder="john@example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">Mobile Number</label>
+                <label className={isGalaMode ? "text-[10px] font-black text-gray-400 uppercase tracking-widest" : "text-xs font-bold text-gray-500 uppercase"}>
+                  Mobile Number
+                </label>
                 <input
                   required
                   type="tel"
                   value={formData.mobile}
                   onChange={(e) => setFormData({...formData, mobile: e.target.value})}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37]"
+                  className={`w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] ${isGalaMode ? "text-sm" : ""}`}
                   placeholder="+1 234 567 890"
                 />
               </div>
@@ -439,7 +553,11 @@ export default function DonationForm() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#D4AF37] text-[#0A1128] py-5 rounded-2xl font-bold text-lg hover:bg-[#c2a032] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    className={`w-full bg-[#D4AF37] text-[#0A1128] py-5 rounded-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 ${
+                      isGalaMode 
+                        ? "font-black uppercase text-xs tracking-widest hover:bg-[#c2a032]" 
+                        : "font-bold text-lg hover:bg-[#c2a032]"
+                    }`}
                   >
                     {isLoading ? (
                       <>

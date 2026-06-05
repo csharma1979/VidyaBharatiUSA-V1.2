@@ -115,8 +115,8 @@ export async function POST(req: Request) {
             currency: "usd",
             product_data: {
               name: isGala ? `${ticketType || "Gala"} Ticket - VidyaBharati USA` : "Donation to VidyaBharati USA",
-              description: isGala 
-                ? `Burlington Gala Event - July 12, 2026 | Burlington Marriott` 
+              description: isGala
+                ? `Los Angeles Gala Event - July 26, 2026 | Sheraton Cerritos Hotel`
                 : `Supporting rural education in India | Donor: ${firstName} ${lastName}`,
             },
             unit_amount: Math.round(amount * 100),

@@ -5,12 +5,7 @@ import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
 import { sendEmail } from "@/lib/mail";
 
-// Stripe requires the raw body for signature verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+
 
 export async function POST(req: Request) {
   const payload = await req.text();
@@ -32,11 +27,11 @@ export async function POST(req: Request) {
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
-      
+
       await connectToDB();
-      
+
       const donation = await Donation.findOne({ stripeSessionId: session.id });
-      
+
       if (donation) {
         donation.paymentStatus = "success";
         donation.paymentMethod = session.payment_method_types?.[0] || "unknown";
@@ -50,18 +45,18 @@ export async function POST(req: Request) {
           const isGala = donation.donationId?.startsWith("GALA-");
           await sendEmail({
             to: donation.email,
-            subject: isGala ? "Burlington Gala Event Ticket Confirmation - VidyaBharati USA" : "Thank you for your donation - VidyaBharati USA",
+            subject: isGala ? "Los Angeles Gala Event Ticket Confirmation - VidyaBharati USA" : "Thank you for your donation - VidyaBharati USA",
             text: isGala 
-              ? `Dear ${donation.firstName},\n\nThank you for purchasing a ticket to the Burlington Gala Event. We have received your payment of $${donation.amount}.\n\nTicket Details: Burlington Gala Event Ticket\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\nLocation: Burlington Marriott, Burlington, Massachusetts\nDate & Time: Sunday, July 12, 2026\n\nThank you for supporting education, culture, and values-based learning.\n\nVisit your dashboard to view your transaction history.`
+              ? `Dear ${donation.firstName},\n\nThank you for purchasing a ticket to the Los Angeles Gala Event. We have received your payment of $${donation.amount}.\n\nTicket Details: Los Angeles Gala Event Ticket\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\nLocation: Sheraton Cerritos Hotel, Cerritos, California\nDate & Time: Sunday, July 26, 2026\n\nThank you for supporting education, culture, and values-based learning.\n\nVisit your dashboard to view your transaction history.`
               : `Dear ${donation.firstName},\n\nThank you for your generous donation of $${donation.amount} to VidyaBharati USA.\n\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\n"No goods or services were provided in exchange for this contribution."\n\nVisit your dashboard to download your official receipt.`,
             html: isGala 
               ? `
-                <h1>Burlington Gala Ticket Confirmation</h1>
+                <h1>Los Angeles Gala Ticket Confirmation</h1>
                 <p>Dear ${donation.firstName},</p>
-                <p>Thank you for purchasing a ticket to the <strong>Burlington Gala Event</strong>. We have received your payment of <strong>$${donation.amount}</strong>.</p>
-                <p><strong>Event:</strong> Burlington Gala Event<br/>
-                <strong>Date & Time:</strong> Sunday, July 12, 2026<br/>
-                <strong>Venue:</strong> Burlington Marriott, Burlington, Massachusetts<br/>
+                <p>Thank you for purchasing a ticket to the <strong>Los Angeles Gala Event</strong>. We have received your payment of <strong>$${donation.amount}</strong>.</p>
+                <p><strong>Event:</strong> Los Angeles Gala Event<br/>
+                <strong>Date & Time:</strong> Sunday, July 26, 2026<br/>
+                <strong>Venue:</strong> Sheraton Cerritos Hotel, Cerritos, California<br/>
                 <strong>Transaction ID:</strong> ${donation._id}<br/>
                 <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
                 <p>Thank you for supporting education, culture, and values-based learning.</p>

@@ -185,11 +185,11 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                   <>
                     <div className="flex justify-between">
                       <span className="text-gray-400 font-semibold">Event Name:</span>
-                      <span className="font-bold text-[#0A1128]">Burlington Gala Event</span>
+                      <span className="font-bold text-[#0A1128]">Los Angeles Gala Event</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400 font-semibold">Event Date:</span>
-                      <span className="font-bold text-[#0A1128]">Sunday, July 12, 2026</span>
+                      <span className="font-bold text-[#0A1128]">Sunday, July 26, 2026</span>
                     </div>
                     {donation.seatNumber && (
                       <div className="flex justify-between">
@@ -221,7 +221,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 text-center space-y-4 print-shadow-none">
             <p className="text-sm text-gray-600 leading-relaxed font-medium italic">
               {isGala 
-                ? "This receipt confirms your registration for the Burlington Gala Event. The tax-deductible portion of this ticket is limited to the excess of the payment over the value of goods or services provided."
+                ? "This receipt confirms your registration for the Los Angeles Gala Event. The tax-deductible portion of this ticket is limited to the excess of the payment over the value of goods or services provided."
                 : '"No goods or services were provided in exchange for this contribution. Your donation to VidyaBharati USA is tax-deductible to the extent allowed by law."'
               }
             </p>

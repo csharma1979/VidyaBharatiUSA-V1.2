@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Loader2, 
-  CreditCard, 
-  User, 
-  ChevronRight, 
-  AlertCircle, 
+import {
+  Loader2,
+  CreditCard,
+  User,
+  ChevronRight,
+  AlertCircle,
   Ticket,
   ChevronLeft
 } from "lucide-react";
@@ -15,33 +15,33 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/Button";
 
 const ticketOptions = [
-  { 
-    id: "gold", 
-    name: "Gala Gold Ticket", 
-    price: 500, 
+  {
+    id: "gold",
+    name: "Gala Gold Ticket",
+    price: 500,
     description: "Premium seating, VIP reception, and special recognition in the program.",
-    color: "border-yellow-400 bg-amber-50/30 text-amber-900" 
+    color: "border-yellow-400 bg-amber-50/30 text-amber-900"
   },
-  { 
-    id: "silver", 
-    name: "Gala Silver Ticket", 
-    price: 200, 
+  {
+    id: "silver",
+    name: "Gala Silver Ticket",
+    price: 200,
     description: "Preferred seating and entry to the networking reception.",
-    color: "border-slate-300 bg-slate-50/50 text-slate-800" 
+    color: "border-slate-300 bg-slate-50/50 text-slate-800"
   },
-  { 
-    id: "bronze", 
-    name: "Gala Bronze Ticket", 
-    price: 100, 
+  {
+    id: "bronze",
+    name: "Gala Bronze Ticket",
+    price: 100,
     description: "General admission seating for the Gala event.",
-    color: "border-amber-600/30 bg-orange-50/10 text-orange-900" 
+    color: "border-amber-600/30 bg-orange-50/10 text-orange-900"
   }
 ];
 
 export default function GalaTicketForm() {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
-  
+
   const [step, setStep] = useState(1); // 1: Ticket Selection, 2: Guest Details
   const [selectedTicket, setSelectedTicket] = useState(ticketOptions[1]); // Default to Silver Ticket
   const [formData, setFormData] = useState({
@@ -131,23 +131,22 @@ export default function GalaTicketForm() {
   };
 
   return (
-    <div ref={formRef} className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 max-w-xl mx-auto scroll-mt-32">
+    <div ref={formRef} className="h-full flex flex-col scroll-mt-32">
+    <div className="flex-1 bg-white rounded-3xl overflow-hidden">
       {/* Header Tabs */}
       <div className="flex border-b">
         <button
           onClick={() => setStep(1)}
-          className={`flex-1 py-6 text-xs font-black uppercase tracking-widest transition-all ${
-            step === 1 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
-          }`}
+          className={`flex-1 py-6 text-xs font-black uppercase tracking-widest transition-all ${step === 1 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
+            }`}
         >
           1. Select Ticket
         </button>
         <button
           disabled={!selectedTicket}
           onClick={() => setStep(2)}
-          className={`flex-1 py-6 text-xs font-black uppercase tracking-widest transition-all ${
-            step === 2 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
-          }`}
+          className={`flex-1 py-6 text-xs font-black uppercase tracking-widest transition-all ${step === 2 ? "text-[#0A1128] border-b-2 border-[#D4AF37]" : "text-gray-400 bg-gray-50/50"
+            }`}
         >
           2. Register details
         </button>
@@ -170,10 +169,7 @@ export default function GalaTicketForm() {
               exit={{ opacity: 0, x: 10 }}
               className="space-y-8"
             >
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-serif font-black text-[#0A1128] uppercase tracking-tight">Select Ticket Tier</h2>
-                <p className="text-sm text-gray-500">Choose your ticket package for the Gala Dinner.</p>
-              </div>
+
 
               <div className="space-y-4">
                 {ticketOptions.map((option) => {
@@ -183,16 +179,14 @@ export default function GalaTicketForm() {
                       key={option.id}
                       type="button"
                       onClick={() => setSelectedTicket(option)}
-                      className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-left cursor-pointer ${
-                        isSelected 
-                          ? "border-[#D4AF37] bg-amber-50/40 shadow-md" 
+                      className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all text-left cursor-pointer ${isSelected
+                          ? "border-[#D4AF37] bg-amber-50/40 shadow-md"
                           : "border-gray-100 hover:border-[#D4AF37]/30 bg-white"
-                      }`}
+                        }`}
                     >
                       <div className="flex gap-4 items-center">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
-                          isSelected ? "bg-[#D4AF37]/15 text-[#0A1128] border-[#D4AF37]" : "bg-slate-50 text-slate-400 border-gray-100"
-                        }`}>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${isSelected ? "bg-[#D4AF37]/15 text-[#0A1128] border-[#D4AF37]" : "bg-slate-50 text-slate-400 border-gray-100"
+                          }`}>
                           <Ticket className="w-5 h-5" />
                         </div>
                         <div>
@@ -240,7 +234,7 @@ export default function GalaTicketForm() {
                       required
                       type="text"
                       value={formData.firstName}
-                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] text-sm"
                       placeholder="Jane"
                     />
@@ -251,7 +245,7 @@ export default function GalaTicketForm() {
                       required
                       type="text"
                       value={formData.lastName}
-                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                       className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] text-sm"
                       placeholder="Smith"
                     />
@@ -264,7 +258,7 @@ export default function GalaTicketForm() {
                     required
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] text-sm"
                     placeholder="jane.smith@example.com"
                   />
@@ -276,7 +270,7 @@ export default function GalaTicketForm() {
                     required
                     type="tel"
                     value={formData.mobile}
-                    onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                     className="w-full bg-gray-50 border border-gray-100 rounded-xl py-4 px-4 focus:outline-none focus:border-[#D4AF37] text-sm"
                     placeholder="+1 234 567 890"
                   />
@@ -286,7 +280,7 @@ export default function GalaTicketForm() {
                   <div className="flex justify-between items-center mb-6 py-4 border-y border-gray-100">
                     <div className="flex flex-col">
                       <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">{selectedTicket.name}</span>
-                      <span className="text-slate-500 text-[11px] mt-0.5">Burlington Gala Admission</span>
+                      <span className="text-slate-500 text-[11px] mt-0.5">Los Angeles Gala Admission</span>
                     </div>
                     <span className="text-3xl font-serif font-bold text-[#0A1128]">${selectedTicket.price}</span>
                   </div>
@@ -326,6 +320,7 @@ export default function GalaTicketForm() {
           )}
         </AnimatePresence>
       </div>
+    </div>
     </div>
   );
 }
