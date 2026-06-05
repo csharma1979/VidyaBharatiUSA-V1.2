@@ -58,6 +58,44 @@ const DonationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    mobile: {
+      type: String,
+      default: "",
+    },
+    ticketType: {
+      type: String,
+      default: "",
+    },
+    ticketStatus: {
+      type: String,
+      enum: ["Active", "Cancelled", "Refunded", "Checked-In"],
+      default: "Active",
+    },
+    checkInStatus: {
+      type: String,
+      enum: ["Pending", "Checked-In"],
+      default: "Pending",
+    },
+    seatNumber: {
+      type: String,
+      default: "",
+    },
+    tableNumber: {
+      type: String,
+      default: "",
+    },
+    zone: {
+      type: String,
+      default: "",
+    },
+    specialRequirements: {
+      type: String,
+      default: "",
+    },
+    seatingPreference: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

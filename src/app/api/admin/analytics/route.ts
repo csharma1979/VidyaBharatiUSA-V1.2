@@ -8,17 +8,17 @@ export async function GET() {
     await connectToDB();
 
     const totalDonations = await Donation.aggregate([
-      { $match: { paymentStatus: "success" } },
+      { $match: { paymentStatus: "success", donationId: { $not: /^GALA-/i } } },
       { $group: { _id: null, total: { $sum: "$amount" } } }
     ]);
 
-    const guestDonations = await Donation.countDocuments({ isGuest: true, paymentStatus: "success" });
-    const registeredDonations = await Donation.countDocuments({ isGuest: false, paymentStatus: "success" });
+    const guestDonations = await Donation.countDocuments({ isGuest: true, paymentStatus: "success", donationId: { $not: /^GALA-/i } });
+    const registeredDonations = await Donation.countDocuments({ isGuest: false, paymentStatus: "success", donationId: { $not: /^GALA-/i } });
     
     const totalUsers = await User.countDocuments({ role: "user" });
 
     // Recent donations for the dashboard
-    const recentActivity = await Donation.find({ paymentStatus: "success" })
+    const recentActivity = await Donation.find({ paymentStatus: "success", donationId: { $not: /^GALA-/i } })
       .sort({ createdAt: -1 })
       .limit(5);
 

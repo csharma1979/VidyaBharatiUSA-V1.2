@@ -14,13 +14,14 @@ export async function GET(req: Request) {
 
     await connectToDB();
 
-    // Fetch successful, failed, pending, and refunded donations for this user (including guest donations linked to this email)
+    // Fetch successful, failed, pending, and refunded donations for this user (excluding Gala tickets)
     const donations = await Donation.find({
       $or: [
         { email },
         { userId: userId || undefined }
       ],
-      paymentStatus: { $in: ["success", "failed", "pending", "refunded"] }
+      paymentStatus: { $in: ["success", "failed", "pending", "refunded"] },
+      donationId: { $not: /^GALA-/i }
     }).sort({ createdAt: -1 });
 
     const reconciledDonations = await Promise.all(

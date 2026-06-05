@@ -160,7 +160,7 @@ export default function AdminDonationsPage() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#0A1128]">Donation Payments</h2>
+          <h2 className="text-2xl font-bold text-[#0A1128]">Donation</h2>
           <p className="text-gray-500 text-sm mt-1">Monitor and track every contribution made to the organization.</p>
         </div>
         

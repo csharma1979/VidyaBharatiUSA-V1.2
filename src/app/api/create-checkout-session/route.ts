@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { amount, firstName, lastName, email, userId, isGuest, successUrl, cancelUrl, retryDonationId } = await req.json();
+    const { amount, firstName, lastName, email, userId, isGuest, successUrl, cancelUrl, retryDonationId, isGala, ticketType, mobile } = await req.json();
 
     // 1. Validate required fields
     if (!amount || !email || !firstName || !lastName) {
@@ -69,7 +69,9 @@ export async function POST(req: Request) {
       donation.failureReason = null;
       await donation.save();
     } else {
-      const donationId = `VB-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+      const donationId = isGala
+        ? `GALA-${(ticketType || "TICKET").toUpperCase().replace(/\s+/g, "_")}-${Date.now()}-${Math.floor(Math.random() * 10000)}`
+        : `VB-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
       donation = await Donation.create({
         donationId,
@@ -80,6 +82,8 @@ export async function POST(req: Request) {
         amount,
         isGuest: !!isGuest,
         paymentStatus: "pending",
+        mobile: mobile || "",
+        ticketType: ticketType || "",
       });
     }
 
@@ -110,8 +114,10 @@ export async function POST(req: Request) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "Donation to VidyaBharati USA",
-              description: `Supporting rural education in India | Donor: ${firstName} ${lastName}`,
+              name: isGala ? `${ticketType || "Gala"} Ticket - VidyaBharati USA` : "Donation to VidyaBharati USA",
+              description: isGala 
+                ? `Burlington Gala Event - July 12, 2026 | Burlington Marriott` 
+                : `Supporting rural education in India | Donor: ${firstName} ${lastName}`,
             },
             unit_amount: Math.round(amount * 100),
           },
@@ -124,9 +130,11 @@ export async function POST(req: Request) {
       customer_email: email,
       metadata: {
         donationId: donation._id.toString(),
-        customDonationId: donation.donationId,
+        customDonationId: donation.donationId || "",
         userId: userId || "",
         isGuest: isGuest ? "true" : "false",
+        isGala: isGala ? "true" : "false",
+        ticketType: ticketType || "",
       },
     });
 

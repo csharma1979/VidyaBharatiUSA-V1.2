@@ -7,10 +7,16 @@ import type { Metadata } from "next";
 import PrintButton from "@/components/donation/PrintButton";
 import { reconcileDonation } from "@/lib/reconcile";
 
-export const metadata: Metadata = {
-  title: "Donation Receipt | VidyaBharati USA",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  await connectToDB();
+  const donation = await Donation.findById(id);
+  const isGala = donation?.donationId?.startsWith("GALA-");
+  return {
+    title: isGala ? "Gala Ticket Receipt | VidyaBharati USA" : "Donation Receipt | VidyaBharati USA",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,8 +32,11 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   }
 
   const isRefunded = donation.paymentStatus === "refunded";
+  const isGala = donation.donationId?.startsWith("GALA-");
   const taxYear = new Date(donation.createdAt).getFullYear();
-  const receiptNumber = `REC-${taxYear}-${donation._id.toString().substring(donation._id.toString().length - 6).toUpperCase()}`;
+  const receiptNumber = isGala
+    ? `TKT-${taxYear}-${donation._id.toString().substring(donation._id.toString().length - 6).toUpperCase()}`
+    : `REC-${taxYear}-${donation._id.toString().substring(donation._id.toString().length - 6).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 md:py-20 print:bg-white print:py-0 print:px-0">
@@ -61,14 +70,14 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
         {isRefunded && (
           <div className="bg-rose-50 border-b border-rose-200 px-6 py-4 flex items-center justify-center gap-2 text-rose-700 font-bold uppercase tracking-wider text-xs md:text-sm print:bg-rose-50">
             <AlertTriangle className="w-5 h-5 text-rose-600" />
-            <span>Void - This donation has been refunded</span>
+            <span>Void - This transaction has been refunded</span>
           </div>
         )}
 
         {/* Action Header / Print Bar */}
         <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center print-hidden">
           <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-            {isRefunded ? "Refunded Transaction" : "Official Receipt"}
+            {isRefunded ? "Refunded Transaction" : isGala ? "Gala Ticket Receipt" : "Official Donation Receipt"}
           </span>
           <PrintButton />
         </div>
@@ -115,11 +124,11 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                 </div>
               ) : (
                 <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-black uppercase tracking-widest">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Verified Contribution
+                  <ShieldCheck className="w-3.5 h-3.5" /> {isGala ? "Verified Ticket" : "Verified Contribution"}
                 </div>
               )}
               <div className="mt-4 md:text-right">
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Receipt Date</p>
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Transaction Date</p>
                 <p className="text-sm font-bold text-[#0A1128] mt-1">
                   {new Date(donation.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
@@ -137,13 +146,14 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
             <div className="space-y-4">
               <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest pb-1 border-b border-gray-50">
-                Donor Information
+                {isGala ? "Attendee Information" : "Donor Information"}
               </h3>
               <div className="space-y-1">
                 <p className="text-base font-black text-[#0A1128]">{donation.firstName} {donation.lastName}</p>
                 <p className="text-gray-500 font-medium text-xs">{donation.email}</p>
+                {donation.mobile && <p className="text-gray-500 font-medium text-xs">Phone: {donation.mobile}</p>}
                 <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1.5">
-                  {donation.isGuest ? "Guest Contributor" : "Registered Donor"}
+                  {isGala ? "Event Attendee" : (donation.isGuest ? "Guest Contributor" : "Registered Donor")}
                 </p>
               </div>
             </div>
@@ -168,9 +178,27 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400 font-semibold">Campaign / Cause:</span>
-                  <span className="font-bold text-[#0A1128]">General Fund Support</span>
+                  <span className="text-gray-400 font-semibold">{isGala ? "Ticket Tier:" : "Campaign / Cause:"}</span>
+                  <span className="font-bold text-[#0A1128]">{isGala ? (donation.ticketType || "Gala Ticket") : "General Fund Support"}</span>
                 </div>
+                {isGala && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 font-semibold">Event Name:</span>
+                      <span className="font-bold text-[#0A1128]">Burlington Gala Event</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 font-semibold">Event Date:</span>
+                      <span className="font-bold text-[#0A1128]">Sunday, July 12, 2026</span>
+                    </div>
+                    {donation.seatNumber && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400 font-semibold">Seat Assignment:</span>
+                        <span className="font-bold text-emerald-600">{donation.seatNumber} (Table {donation.tableNumber || "N/A"})</span>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -178,19 +206,24 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           {/* Amount Box */}
           <div className="bg-[#0A1128] rounded-[24px] p-8 md:p-10 text-white text-center space-y-3 relative overflow-hidden print-bg-light">
              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl" />
-             <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.2em]">Total Donation Amount</p>
+             <p className="text-[#D4AF37] text-xs font-black uppercase tracking-[0.2em]">
+               {isGala ? "Total Amount Paid" : "Total Donation Amount"}
+             </p>
              <h2 className="text-5xl md:text-6xl font-serif font-black print-text-dark">
                ${donation.amount.toLocaleString()} <span className="text-xl md:text-2xl opacity-40 font-sans font-medium">USD</span>
              </h2>
              <p className="text-white/40 text-[9px] uppercase font-black tracking-[0.25em] print-text-dark">
-               Official Tax Exempt Contribution
+               {isGala ? "Official Gala Ticket Purchase" : "Official Tax Exempt Contribution"}
              </p>
           </div>
 
           {/* Tax Compliance Info */}
           <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 text-center space-y-4 print-shadow-none">
             <p className="text-sm text-gray-600 leading-relaxed font-medium italic">
-              "No goods or services were provided in exchange for this contribution. Your donation to VidyaBharati USA is tax-deductible to the extent allowed by law."
+              {isGala 
+                ? "This receipt confirms your registration for the Burlington Gala Event. The tax-deductible portion of this ticket is limited to the excess of the payment over the value of goods or services provided."
+                : '"No goods or services were provided in exchange for this contribution. Your donation to VidyaBharati USA is tax-deductible to the extent allowed by law."'
+              }
             </p>
             <div className="h-px bg-slate-200/50 w-24 mx-auto" />
             <div className="text-[10px] text-gray-500 font-bold space-y-1">
@@ -212,17 +245,17 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                 </p>
              </div>
              <p className="text-[9px] text-gray-300 max-w-[240px] text-center sm:text-right font-bold uppercase tracking-wider leading-relaxed">
-                This is an official U.S. tax receipt generated securely. No physical signature is required.
+                This is an official transaction receipt generated securely. No physical signature is required.
              </p>
           </div>
 
           {/* Back link for screen */}
           <div className="text-center pt-4 print-hidden">
             <a 
-              href="/dashboard"
+              href={isGala ? "/LA-Gala" : "/dashboard"}
               className="text-[#D4AF37] hover:text-[#0A1128] text-xs font-black uppercase tracking-widest transition-colors"
             >
-              Return to Donor Dashboard
+              {isGala ? "Return to Gala Event Page" : "Return to Donor Dashboard"}
             </a>
           </div>
 

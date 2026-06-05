@@ -60,7 +60,7 @@ export function AnnouncementPopup() {
             <div className="relative w-full aspect-[4/5] bg-slate-100 overflow-hidden">
               <Image
                 src="/images/LosAngeles-Gala-event.jpeg"
-                alt="Los Angeles Gala Event Flyer"
+                alt="Burlington Gala Event Flyer"
                 fill
                 className="object-cover"
                 priority
@@ -71,12 +71,12 @@ export function AnnouncementPopup() {
             {/* Action Bar */}
             <div className="bg-deep-blue px-6 py-4 flex gap-4 justify-between items-center text-white shrink-0">
               <div className="flex flex-col">
-                <span className="text-sm font-black tracking-wide">Los Angeles Gala Event</span>
-                <span className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">July 26, 2026</span>
+                <span className="text-sm font-black tracking-wide">Burlington Gala Event</span>
+                <span className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">July 12, 2026</span>
               </div>
-              <Link href="/donate" onClick={handleClose}>
+              <Link href="/LA-Gala" onClick={handleClose}>
                 <Button className="bg-saffron hover:bg-orange-500 text-white font-black rounded-xl h-10 px-5 text-xs uppercase tracking-widest shadow-md">
-                  Support Tour
+                  Register Now
                 </Button>
               </Link>
             </div>

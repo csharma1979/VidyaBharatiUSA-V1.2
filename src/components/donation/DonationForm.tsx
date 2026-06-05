@@ -22,7 +22,11 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
-const amounts = [100, 250, 500, 750, 1000];
+const donationOptions = [
+  { value: 5000, label: "Sponsor 10 Children" },
+  { value: 2500, label: "Sponsor 5 Children" },
+  { value: 500, label: "Sponsor 1 Child" },
+];
 
 export default function DonationForm() {
   const router = useRouter();
@@ -32,7 +36,7 @@ export default function DonationForm() {
   const [step, setStep] = useState(0); // 0: Selection, 1: Amount, 2: Info/Auth, 3: Offline Info
   const [isGuest, setIsGuest] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(100);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(500);
   const [customAmount, setCustomAmount] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
@@ -275,39 +279,43 @@ export default function DonationForm() {
                 )}
               </AnimatePresence>
               
-              <div ref={amountSectionRef} className="grid grid-cols-2 sm:grid-cols-3 gap-4 relative z-10">
-                {amounts.map((amount) => (
+              <div ref={amountSectionRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                {donationOptions.map((option) => (
                   <button
-                    key={amount}
+                    key={option.value}
                     onClick={() => {
-                      setSelectedAmount(amount);
+                      setSelectedAmount(option.value);
                       setCustomAmount("");
                     }}
-                    className={`py-6 rounded-2xl border-2 transition-all duration-300 ${
-                      selectedAmount === amount && !customAmount
+                    className={`py-5 px-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
+                      selectedAmount === option.value && !customAmount
                         ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] shadow-md"
                         : "border-gray-100 hover:border-[#D4AF37]/30 text-gray-600"
                     }`}
                   >
-                    <span className="text-sm font-bold block opacity-60 mb-1">USD</span>
-                    <span className="text-2xl font-bold font-serif">${amount}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider block opacity-70 mb-1">{option.label}</span>
+                    <span className="text-2xl font-bold font-serif">${option.value.toLocaleString()}</span>
                   </button>
                 ))}
-                <div className="col-span-full sm:col-span-1 relative">
+                <div className="relative flex items-center">
+                  <span className="absolute left-4 text-xl font-bold font-serif text-gray-400">$</span>
                   <input
                     type="number"
-                    placeholder="Custom"
+                    placeholder="Any Amount"
                     value={customAmount}
                     onChange={(e) => {
                       setCustomAmount(e.target.value);
                       setSelectedAmount(null);
                     }}
-                    className={`w-full py-6 px-4 rounded-2xl border-2 text-center transition-all focus:outline-none ${
+                    className={`w-full pt-6 pb-2 pl-9 pr-4 rounded-2xl border-2 text-left transition-all font-bold font-serif text-lg focus:outline-none ${
                       customAmount 
-                        ? "border-[#D4AF37] bg-amber-50 text-[#0A1128] font-bold" 
-                        : "border-gray-100 text-gray-600"
+                        ? "border-[#D4AF37] bg-amber-50 text-[#0A1128]" 
+                        : "border-gray-100 text-gray-600 focus:border-[#D4AF37]/50"
                     }`}
                   />
+                  <span className="absolute left-9 top-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400 pointer-events-none">
+                    Custom Donation
+                  </span>
                 </div>
               </div>
             </div>

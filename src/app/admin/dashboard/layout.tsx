@@ -15,6 +15,7 @@ import {
   Globe,
   PenTool,
   User as UserIcon,
+  Ticket,
 } from "lucide-react";
 import { AdminFooter } from "@/components/admin/AdminFooter";
 
@@ -72,7 +73,8 @@ export default function DashboardLayout({
     {
       title: "Manage Donation",
       items: [
-        { name: "Payments", href: "/admin/dashboard/donations", icon: CreditCard },
+        { name: "Donation", href: "/admin/dashboard/donations", icon: CreditCard },
+        { name: "Gala Tickets", href: "/admin/dashboard/tickets", icon: Ticket },
         { name: "Users", href: "/admin/dashboard/users", icon: Users },
       ]
     },

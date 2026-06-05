@@ -47,22 +47,39 @@ export async function POST(req: Request) {
 
         // Send confirmation email / receipt
         try {
+          const isGala = donation.donationId?.startsWith("GALA-");
           await sendEmail({
             to: donation.email,
-            subject: "Thank you for your donation - VidyaBharati USA",
-            text: `Dear ${donation.firstName},\n\nThank you for your generous donation of $${donation.amount} to VidyaBharati USA.\n\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\n"No goods or services were provided in exchange for this contribution."\n\nVisit your dashboard to download your official receipt.`,
-            html: `
-              <h1>Thank you for your donation</h1>
-              <p>Dear ${donation.firstName},</p>
-              <p>Thank you for your generous donation of <strong>$${donation.amount}</strong> to VidyaBharati USA.</p>
-              <p><strong>Transaction ID:</strong> ${donation._id}<br/>
-              <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-              <p><em>"No goods or services were provided in exchange for this contribution."</em></p>
-              <p>Visit your dashboard to download your official receipt.</p>
-            `,
+            subject: isGala ? "Burlington Gala Event Ticket Confirmation - VidyaBharati USA" : "Thank you for your donation - VidyaBharati USA",
+            text: isGala 
+              ? `Dear ${donation.firstName},\n\nThank you for purchasing a ticket to the Burlington Gala Event. We have received your payment of $${donation.amount}.\n\nTicket Details: Burlington Gala Event Ticket\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\nLocation: Burlington Marriott, Burlington, Massachusetts\nDate & Time: Sunday, July 12, 2026\n\nThank you for supporting education, culture, and values-based learning.\n\nVisit your dashboard to view your transaction history.`
+              : `Dear ${donation.firstName},\n\nThank you for your generous donation of $${donation.amount} to VidyaBharati USA.\n\nTransaction ID: ${donation._id}\nDate: ${new Date().toLocaleDateString()}\n\n"No goods or services were provided in exchange for this contribution."\n\nVisit your dashboard to download your official receipt.`,
+            html: isGala 
+              ? `
+                <h1>Burlington Gala Ticket Confirmation</h1>
+                <p>Dear ${donation.firstName},</p>
+                <p>Thank you for purchasing a ticket to the <strong>Burlington Gala Event</strong>. We have received your payment of <strong>$${donation.amount}</strong>.</p>
+                <p><strong>Event:</strong> Burlington Gala Event<br/>
+                <strong>Date & Time:</strong> Sunday, July 12, 2026<br/>
+                <strong>Venue:</strong> Burlington Marriott, Burlington, Massachusetts<br/>
+                <strong>Transaction ID:</strong> ${donation._id}<br/>
+                <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p>Thank you for supporting education, culture, and values-based learning.</p>
+                <p>Visit your dashboard to view your transaction history.</p>
+              `
+              : `
+                <h1>Thank you for your donation</h1>
+                <p>Dear ${donation.firstName},</p>
+                <p>Thank you for your generous donation of <strong>$${donation.amount}</strong> to VidyaBharati USA.</p>
+                <p><strong>Transaction ID:</strong> ${donation._id}<br/>
+                <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><em>"No goods or services were provided in exchange for this contribution."</em></p>
+                <p>Visit your dashboard to download your official receipt.</p>
+              `,
+            cc: isGala ? "anilparekh2000@gmail.com" : undefined,
           });
         } catch (emailErr) {
-          console.error("Failed to send donation receipt email:", emailErr);
+          console.error("Failed to send receipt email:", emailErr);
         }
       }
     } else if (event.type === "checkout.session.expired") {

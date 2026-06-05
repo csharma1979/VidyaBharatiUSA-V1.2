@@ -7,9 +7,10 @@ export async function GET() {
   try {
     await connectToDB();
 
-    // Fetch all donations, sorted by creation date descending
-    const donations = await Donation.find({})
-      .sort({ createdAt: -1 });
+    // Fetch all donations (excluding Gala tickets), sorted by creation date descending
+    const donations = await Donation.find({
+      donationId: { $not: /^GALA-/i }
+    }).sort({ createdAt: -1 });
 
     const reconciledDonations = await Promise.all(
       donations.map(async (donation) => {
