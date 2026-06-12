@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { getStripeConfig } from "@/lib/stripe-config";
 import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
-import { sendEmail } from "@/lib/mail";
+import { sendDonationConfirmation } from "@/lib/notifications/emailService";
 
 export async function reconcileDonation(donation: any) {
   // Only try to reconcile pending donations that have a Stripe session ID
@@ -40,41 +40,7 @@ export async function reconcileDonation(donation: any) {
 
       // Send confirmation email / receipt
       try {
-        const isGala = latestDonation.donationId?.startsWith("GALA-");
-        await sendEmail({
-          to: latestDonation.email,
-          subject: isGala ? "Los Angeles Gala Event Ticket Confirmation - VidyaBharati USA" : "Thank you for your donation - VidyaBharati USA",
-          text: isGala
-            ? `Dear ${latestDonation.firstName},\n\nThank you for purchasing a ticket to the Los Angeles Gala Event. We have received your payment of $${latestDonation.amount}.\n\nTicket Details: Los Angeles Gala Event Ticket\nTransaction ID: ${latestDonation._id}\nDate: ${new Date().toLocaleDateString()}\n\nLocation: Sheraton Cerritos Hotel, Cerritos, California\nDate & Time: Sunday, July 26, 2026\n\nThank you for supporting education, culture, and values-based learning.\n\nVisit your dashboard to view your transaction history.`
-            : `Dear ${latestDonation.firstName},\n\nThank you for your generous donation of $${latestDonation.amount} to VidyaBharati USA.\n\nTransaction ID: ${latestDonation._id}\nDate: ${new Date().toLocaleDateString()}\n\n"No goods or services were provided in exchange for this contribution."\n\nVisit your dashboard to download your official receipt.`,
-          html: isGala
-            ? `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-                <h1 style="color: #0A1128; text-align: center;">Los Angeles Gala Ticket Confirmation</h1>
-                <p>Dear ${latestDonation.firstName},</p>
-                <p>Thank you for purchasing a ticket to the <strong>Los Angeles Gala Event</strong>. We have received your payment of <strong>$${latestDonation.amount}</strong>.</p>
-                <p><strong>Event:</strong> Los Angeles Gala Event<br/>
-                <strong>Date & Time:</strong> Sunday, July 26, 2026<br/>
-                <strong>Venue:</strong> Sheraton Cerritos Hotel, Cerritos, California<br/>
-                <strong>Transaction ID:</strong> ${latestDonation._id}<br/>
-                <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                <p>Thank you for supporting education, culture, and values-based learning.</p>
-                <p>Visit your dashboard to view your transaction history.</p>
-              </div>
-            `
-            : `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 12px;">
-                <h1 style="color: #0A1128; text-align: center;">Thank You for Your Donation</h1>
-                <p>Dear ${latestDonation.firstName},</p>
-                <p>Thank you for your generous donation of <strong>$${latestDonation.amount}</strong> to VidyaBharati USA.</p>
-                <p><strong>Transaction ID:</strong> ${latestDonation._id}<br/>
-                <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                <p><em>"No goods or services were provided in exchange for this contribution."</em></p>
-                <p>Visit your dashboard to download your official receipt.</p>
-              </div>
-            `,
-          cc: isGala ? "anilparekh2000@gmail.com" : undefined,
-        });
+        await sendDonationConfirmation(latestDonation._id.toString());
       } catch (emailErr) {
         console.error("[Reconcile] Failed to send receipt email:", emailErr);
       }

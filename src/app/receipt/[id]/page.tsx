@@ -102,7 +102,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                 />
                 <div>
                   <h1 className="text-2xl font-serif font-black text-[#0A1128] leading-none">
-                    VidyaBharati <span className="text-[#D4AF37]">USA</span>
+                    Vidya Bharati Foundation of <span className="text-[#D4AF37]">USA</span>
                   </h1>
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider mt-1">
                     Supporting Rural Education
@@ -110,10 +110,10 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
               <div className="text-xs text-gray-500 leading-relaxed font-medium">
-                <p>VidyaBharati USA</p>
-                <p>123 Nonprofit Lane, Suite 100</p>
-                <p>New York, NY 10001, United States</p>
-                <p>Email: contact@vidyabharatiusa.org</p>
+                <p>Vidya Bharati Foundation of USA</p>
+                <p>29 Olde Hamlet Dr.</p>
+                <p>Jericho, NY 11237</p>
+                <p>Email: support@vidyabharatiusa.org</p>
               </div>
             </div>
 
@@ -227,9 +227,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
             </p>
             <div className="h-px bg-slate-200/50 w-24 mx-auto" />
             <div className="text-[10px] text-gray-500 font-bold space-y-1">
-              <p>VidyaBharati USA is a registered 501(c)(3) tax-exempt public charitable organization.</p>
+              <p>Vidya Bharati Foundation of USA is a registered 501(c)(3) tax-exempt public charitable organization.</p>
               <p className="text-slate-800 font-black">
-                Employer Identification Number (EIN): <span className="font-mono">88-1234567</span> • Filing Year: {taxYear}
+                Employer Identification Number (EIN): <span className="font-mono">47-4676188</span> • Filing Year: {taxYear}
               </p>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
              <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Authorized By</p>
                 <p className="font-serif italic text-lg text-[#0A1128] mt-1.5 font-bold">
-                  VidyaBharati USA Administration
+                  Vidya Bharati Foundation of USA Administration
                 </p>
              </div>
              <p className="text-[9px] text-gray-300 max-w-[240px] text-center sm:text-right font-bold uppercase tracking-wider leading-relaxed">

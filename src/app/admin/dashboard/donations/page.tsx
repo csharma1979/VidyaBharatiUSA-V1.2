@@ -17,7 +17,10 @@ import {
   X,
   Copy,
   Check,
-  Trash2
+  Trash2,
+  Mail,
+  Send,
+  Eye
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -36,6 +39,18 @@ interface Donation {
   stripeSessionId?: string;
   isGuest: boolean;
   createdAt: string;
+  latestEmailStatus?: string | null;
+  latestEmailSentAt?: string | null;
+  emailLogs?: Array<{
+    _id: string;
+    email: string;
+    subject: string;
+    status: string;
+    error?: string | null;
+    sentAt: string;
+    isManual: boolean;
+    type: string;
+  }>;
 }
 
 export default function AdminDonationsPage() {
@@ -47,6 +62,26 @@ export default function AdminDonationsPage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [donationToDelete, setDonationToDelete] = useState<Donation | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [previewEmail, setPreviewEmail] = useState<{ subject: string; html: string; text: string } | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [previewViewMode, setPreviewViewMode] = useState<"html" | "text">("html");
+
+  const handlePreviewEmail = async (donationId: string, logId?: string) => {
+    setIsPreviewLoading(true);
+    try {
+      const url = `/api/admin/donations/preview-email?donationId=${donationId}${logId ? `&logId=${logId}` : ""}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch email preview");
+      setPreviewEmail(data);
+      setPreviewViewMode("html");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to load email preview");
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -89,6 +124,7 @@ export default function AdminDonationsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch donations");
       setDonations(data);
+      return data;
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -198,6 +234,7 @@ export default function AdminDonationsPage() {
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Donor</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Email Confirmation</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
@@ -232,6 +269,23 @@ export default function AdminDonationsPage() {
                           {donation.paymentStatus === "failed" && <XCircle className="w-3 h-3" />}
                           {donation.paymentStatus.toUpperCase()}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {donation.paymentStatus === "success" ? (
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold border ${
+                            donation.latestEmailStatus === "sent"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                              : donation.latestEmailStatus === "failed"
+                              ? "bg-red-50 text-red-700 border-red-100"
+                              : donation.latestEmailStatus === "pending"
+                              ? "bg-amber-50 text-amber-700 border-amber-100"
+                              : "bg-gray-50 text-gray-600 border-gray-200"
+                          }`}>
+                            {(donation.latestEmailStatus || "not sent").toUpperCase()}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-gray-600">
@@ -451,6 +505,159 @@ export default function AdminDonationsPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Email Confirmation Status & Logs */}
+                {selectedDonation.paymentStatus === "success" && (
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-gray-400 border-b border-gray-100 pb-2 flex items-center justify-between">
+                      <span>Email Confirmation</span>
+                      <button
+                        onClick={async () => {
+                          if (isResending) return;
+                          setIsResending(true);
+                          try {
+                            const res = await fetch("/api/admin/donations/resend-email", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ donationId: selectedDonation._id }),
+                            });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || "Failed to send email");
+                            toast.success("Confirmation email triggered successfully!");
+                            const updatedDonations = await fetchDonations();
+                            if (updatedDonations) {
+                              const updatedObj = updatedDonations.find((d: Donation) => d._id === selectedDonation._id);
+                              if (updatedObj) {
+                                setSelectedDonation(updatedObj);
+                              }
+                            }
+                          } catch (err: any) {
+                            toast.error(err.message || "Failed to trigger email send");
+                          } finally {
+                            setIsResending(false);
+                          }
+                        }}
+                        disabled={isResending}
+                        className="text-xs text-[#D4AF37] hover:underline font-bold flex items-center gap-1 hover:text-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isResending ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" /> Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-3 h-3" /> Re-send Email
+                          </>
+                        )}
+                      </button>
+                    </h4>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div>
+                          <p className="text-xs text-gray-400 font-medium">Delivery Status</p>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mt-1 ${
+                            selectedDonation.latestEmailStatus === "sent"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                              : selectedDonation.latestEmailStatus === "failed"
+                              ? "bg-red-50 text-red-700 border border-red-100"
+                              : selectedDonation.latestEmailStatus === "pending"
+                              ? "bg-amber-50 text-amber-700 border border-amber-100"
+                              : "bg-gray-50 text-gray-600 border border-gray-200"
+                          }`}>
+                            {selectedDonation.latestEmailStatus === "sent" && <CheckCircle2 className="w-3 h-3" />}
+                            {selectedDonation.latestEmailStatus === "failed" && <XCircle className="w-3 h-3" />}
+                            {selectedDonation.latestEmailStatus === "pending" && <Clock className="w-3 h-3" />}
+                            {(selectedDonation.latestEmailStatus || "NOT SENT").toUpperCase()}
+                          </span>
+                          <button
+                            onClick={() => handlePreviewEmail(selectedDonation._id)}
+                            disabled={isPreviewLoading}
+                            className="mt-2 text-[10px] text-[#D4AF37] hover:underline flex items-center gap-1 hover:text-amber-600 font-bold disabled:opacity-50"
+                            title="Preview standard email template for this donation"
+                          >
+                            {isPreviewLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Eye className="w-3 h-3" />}
+                            Preview Template
+                          </button>
+                        </div>
+                        {selectedDonation.latestEmailSentAt && (
+                          <div className="text-right">
+                            <p className="text-xs text-gray-400 font-medium">Last Sent</p>
+                            <p className="font-semibold text-gray-700 mt-1">
+                              {new Date(selectedDonation.latestEmailSentAt).toLocaleString(undefined, {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedDonation.emailLogs && selectedDonation.emailLogs.length > 0 ? (
+                        <div className="border border-gray-100 rounded-xl overflow-hidden">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
+                                <th className="p-3">Sent Time</th>
+                                <th className="p-3">Type</th>
+                                <th className="p-3">Status</th>
+                                <th className="p-3 text-right">View</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                              {selectedDonation.emailLogs.map((log: any) => (
+                                <tr key={log._id} className="hover:bg-slate-50/50">
+                                  <td className="p-3 text-gray-600">
+                                    {new Date(log.sentAt).toLocaleString(undefined, {
+                                      dateStyle: "short",
+                                      timeStyle: "short",
+                                    })}
+                                    {log.isManual && (
+                                      <span className="ml-1 text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded border border-blue-100">
+                                        MANUAL
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="p-3 text-gray-600 truncate max-w-[120px]">
+                                    {log.type === "gala_ticket_confirmation" ? "Gala Ticket" : "Donation Thank You"}
+                                  </td>
+                                  <td className="p-3">
+                                    <span className={`inline-flex items-center gap-1 font-bold ${
+                                      log.status === "sent"
+                                        ? "text-emerald-600"
+                                        : log.status === "failed"
+                                        ? "text-red-600"
+                                        : "text-amber-600"
+                                    }`}>
+                                      {log.status === "sent" ? "Sent" : log.status === "failed" ? "Failed" : "Pending"}
+                                    </span>
+                                    {log.error && (
+                                      <p className="text-[10px] text-red-500 mt-0.5 max-w-[150px] truncate" title={log.error}>
+                                        {log.error}
+                                      </p>
+                                    )}
+                                  </td>
+                                  <td className="p-3 text-right">
+                                    <button
+                                      onClick={() => handlePreviewEmail(selectedDonation._id, log._id)}
+                                      disabled={isPreviewLoading}
+                                      className="text-gray-400 hover:text-[#D4AF37] transition-colors p-1"
+                                      title="View this specific email text/layout"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic text-center py-2">No email activity logged yet.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Footer */}
@@ -539,6 +746,93 @@ export default function AdminDonationsPage() {
                   ) : (
                     "Delete Permanently"
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      {/* Email Preview Drawer */}
+      <AnimatePresence>
+        {previewEmail && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setPreviewEmail(null)}
+              className="fixed inset-0 bg-black z-[70] cursor-pointer"
+            />
+
+            {/* Slide-over Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl z-[70] overflow-y-auto flex flex-col border-l border-gray-100"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold text-[#0A1128]">Email Notification Preview</h3>
+                  <p className="text-xs text-gray-500 font-bold">Subject: <span className="font-semibold text-gray-700">{previewEmail.subject}</span></p>
+                </div>
+                <button
+                  onClick={() => setPreviewEmail(null)}
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* View Mode Toggle Tabs */}
+              <div className="px-6 py-3 border-b border-gray-100 flex gap-4 bg-slate-50/30">
+                <button
+                  onClick={() => setPreviewViewMode("html")}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
+                    previewViewMode === "html"
+                      ? "bg-[#0A1128] text-white border-[#0A1128]"
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  HTML Preview
+                </button>
+                <button
+                  onClick={() => setPreviewViewMode("text")}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
+                    previewViewMode === "text"
+                      ? "bg-[#0A1128] text-white border-[#0A1128]"
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  Plain Text View
+                </button>
+              </div>
+
+              {/* Content body */}
+              <div className="p-6 flex-grow flex flex-col min-h-0 bg-slate-50/30">
+                {previewViewMode === "html" ? (
+                  <iframe
+                    srcDoc={previewEmail.html}
+                    className="w-full flex-grow border border-gray-200 rounded-2xl bg-white shadow-sm min-h-[500px]"
+                    title="HTML Email Preview"
+                  />
+                ) : (
+                  <pre className="w-full flex-grow p-5 border border-gray-200 rounded-2xl bg-white shadow-sm font-mono text-xs text-gray-700 overflow-auto whitespace-pre-wrap leading-relaxed select-text">
+                    {previewEmail.text}
+                  </pre>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                <button
+                  onClick={() => setPreviewEmail(null)}
+                  className="px-6 py-2.5 bg-[#0A1128] text-white rounded-xl text-sm font-bold hover:bg-[#1a2b5e] transition-all shadow-sm"
+                >
+                  Close Preview
                 </button>
               </div>
             </motion.div>

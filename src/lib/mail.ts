@@ -16,12 +16,14 @@ export async function sendEmail({
   text,
   html,
   cc,
+  bcc,
 }: {
   to: string;
   subject: string;
   text: string;
   html?: string;
   cc?: string;
+  bcc?: string | string[];
 }) {
   try {
     const info = await transporter.sendMail({
@@ -31,6 +33,7 @@ export async function sendEmail({
       text,
       html: html || text,
       cc,
+      bcc,
     });
     console.log("Message sent: %s", info.messageId);
     return info;

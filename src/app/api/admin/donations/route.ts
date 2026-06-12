@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/db";
 import Donation from "@/models/Donation";
+import EmailLog from "@/models/EmailLog";
 import { reconcileDonation } from "@/lib/reconcile";
 
 export async function GET() {
@@ -21,7 +22,23 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json(reconciledDonations);
+    // Fetch email logs for these donations
+    const donationIds = reconciledDonations.map(d => d._id);
+    const emailLogs = await EmailLog.find({ donationId: { $in: donationIds } }).sort({ sentAt: -1 });
+
+    // Map email logs to their corresponding donation records
+    const donationsWithLogs = reconciledDonations.map(donation => {
+      const logs = emailLogs.filter(log => log.donationId.toString() === donation._id.toString());
+      const latestLog = logs[0] || null;
+      return {
+        ...donation.toObject(),
+        emailLogs: logs,
+        latestEmailStatus: latestLog ? latestLog.status : null,
+        latestEmailSentAt: latestLog ? latestLog.sentAt : null,
+      };
+    });
+
+    return NextResponse.json(donationsWithLogs);
   } catch (error: any) {
     console.error("Admin Donations API Error:", error);
     return NextResponse.json(
