@@ -58,7 +58,7 @@ export async function sendDonationConfirmation(donationId: string, isManual = fa
       subject,
       text,
       html,
-      bcc: ["Vibhutivp@gmail.com", "csharma@fritado.com"],
+      bcc: ["anilparekh2000@gmail.com", "csharma@fritado.com"],
     });
 
     // 7. Update status to sent
